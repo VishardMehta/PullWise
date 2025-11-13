@@ -19,18 +19,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        // If we have a session from auth callback, navigate to dashboard
+        if (session?.user) {
+          await syncUserProfile(session.user);
+          navigate('/dashboard');
+        }
+      } catch (error) {
+        console.error('Error getting session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         (async () => {
           setSession(session);
           setUser(session?.user ?? null);
-          setLoading(false);
 
           if (session?.user) {
             await syncUserProfile(session.user);
@@ -40,7 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const syncUserProfile = async (user: User) => {
     // Prefer enriched data from GitHub API using the provider token when available
