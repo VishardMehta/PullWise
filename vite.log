@@ -1,0 +1,42 @@
+
+> vite_react_shadcn_ts@0.0.0 dev
+> vite
+
+Re-optimizing dependencies because vite config has changed
+Port 5173 is in use, trying another one...
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m827[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+  [32m➜[39m  [1mNetwork[22m: [36mhttp://172.16.211.162:[1m5174[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[2m3:52:42 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:56:03 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:56:17 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:56:32 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:56:34 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:05 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:07 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:11 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:13 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:16 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:18 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:20 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:24 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:27 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:31 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:35 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:36 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:41 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:43 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:48 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:50 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:52 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:57:56 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:58:00 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:58:09 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:58:10 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:58:13 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:58:15 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:58:41 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m3:59:47 pm[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
