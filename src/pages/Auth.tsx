@@ -24,25 +24,33 @@ const Auth = () => {
 
   const handleGitHubLogin = async () => {
     try {
-      if (!envConfigured) {
+      setLoading(true);
+
+      // GitHub OAuth constants
+      const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+      if (!clientId) {
         toast({
-          title: "Missing configuration",
-          description: "Supabase environment variables are not set. Please configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
+          title: "Configuration Error",
+          description: "GitHub Client ID not configured",
           variant: "destructive",
         });
+        setLoading(false);
         return;
       }
-      setLoading(true);
-      
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: window.location.origin,
-          scopes: 'read:user user:email repo read:org',
-        },
-      });
 
-      if (error) throw error;
+      const redirectUri = `${window.location.origin}/api/github/callback`;
+      const scope = 'read:user user:email repo read:org';
+      const state = Math.random().toString(36).substring(7);
+
+      localStorage.setItem('github_oauth_state', state);
+
+      const githubAuthUrl = new URL('https://github.com/login/oauth/authorize');
+      githubAuthUrl.searchParams.set('client_id', clientId);
+      githubAuthUrl.searchParams.set('redirect_uri', redirectUri);
+      githubAuthUrl.searchParams.set('scope', scope);
+      githubAuthUrl.searchParams.set('state', state);
+
+      window.location.href = githubAuthUrl.toString();
     } catch (error: any) {
       toast({
         title: "Authentication Error",
