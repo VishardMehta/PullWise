@@ -1,0 +1,8 @@
+{
+  "name": "PullWise",
+  "runtime": "nodejs",
+  "detectChanges": true,
+  "configPath": "./",
+  "buildCommand": "bun install && bun run build",
+  "startCommand": "bun run preview"
+}
