@@ -1,24 +1,9 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "env": {
-    "VITE_SUPABASE_URL": "@supabase_url",
-    "VITE_SUPABASE_KEY": "@supabase_key",
-    "GEMINI_API_KEY": "@gemini_api_key",
-    "GEMINI_API_URL": "@gemini_api_url",
-    "GEMINI_MODEL": "@gemini_model"
-  },
-  "routes": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "dist/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
