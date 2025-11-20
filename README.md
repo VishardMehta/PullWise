@@ -1,5 +1,5 @@
 # PullWise
-
+ 
 AI-powered code review assistant that analyzes pull requests, detects issues, and suggests fixes. Built with React, Vite, TypeScript, Tailwind CSS, and shadcn-ui. Authentication is powered by Supabase with GitHub OAuth.
 
 ## Quick Start
