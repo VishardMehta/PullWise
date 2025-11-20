@@ -174,7 +174,7 @@ RETURN ONLY THE JSON OBJECT.
     console.log(prompt);
 
     // call backend (assumes vite proxy so keep relative path)
-    const res = await fetch('/api/analyze', {
+    const res = await fetch('https://pullwise.onrender.com/api/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
