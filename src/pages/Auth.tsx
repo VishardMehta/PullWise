@@ -82,7 +82,7 @@ const Auth = () => {
         <section className="container mx-auto px-4 py-20 md:py-32">
           <div className="max-w-md mx-auto">
             <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-br from-white to-white/70 bg-clip-text text-transparent">
                 Welcome to PullWise
               </h1>
               <p className="text-lg text-white/60">
