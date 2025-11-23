@@ -80,6 +80,8 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalCommits, setTotalCommits] = useState(0);
+  const [totalPRs, setTotalPRs] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -142,6 +144,42 @@ const Dashboard = () => {
 
         const reposData = await reposRes.json();
         setRepositories(reposData);
+
+        // Fetch total commits and PRs (using GitHub search API for efficiency)
+        try {
+          // Get total commits from user
+          const commitsRes = await fetch(
+            `https://api.github.com/search/commits?q=author:${profileData.github_username}&per_page=1`,
+            {
+              headers: {
+                Authorization: `Bearer ${providerToken}`,
+                Accept: 'application/vnd.github.cloak-preview+json',
+              },
+            }
+          );
+          if (commitsRes.ok) {
+            const commitsData = await commitsRes.json();
+            setTotalCommits(commitsData.total_count || 0);
+          }
+
+          // Get total PRs from user
+          const prsRes = await fetch(
+            `https://api.github.com/search/issues?q=author:${profileData.github_username}+type:pr&per_page=1`,
+            {
+              headers: {
+                Authorization: `Bearer ${providerToken}`,
+                Accept: 'application/vnd.github+json',
+              },
+            }
+          );
+          if (prsRes.ok) {
+            const prsData = await prsRes.json();
+            setTotalPRs(prsData.total_count || 0);
+          }
+        } catch (err) {
+          console.error('Error fetching commits/PRs:', err);
+          // Don't fail the whole page if this fails
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         // Show error state or handle specific errors
@@ -156,7 +194,7 @@ const Dashboard = () => {
         }
       } finally {
         setLoading(false);
-      }      setLoading(false);
+      }
     };
 
     fetchData();
@@ -301,33 +339,33 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Followers */}
+            {/* Total Commits */}
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm font-medium">Followers</p>
-                    <p className="text-3xl font-bold text-white mt-1">{profile.followers}</p>
-                    <p className="text-xs text-white/40 mt-1">GitHub followers</p>
+                    <p className="text-white/60 text-sm font-medium">Total Commits</p>
+                    <p className="text-3xl font-bold text-white mt-1">{totalCommits}</p>
+                    <p className="text-xs text-white/40 mt-1">All repositories</p>
                   </div>
                   <div className="p-3 bg-pink-500/20 rounded-lg">
-                    <Users className="h-6 w-6 text-pink-400" />
+                    <GitCommit className="h-6 w-6 text-pink-400" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Following */}
+            {/* Total Pull Requests */}
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/60 text-sm font-medium">Following</p>
-                    <p className="text-3xl font-bold text-white mt-1">{profile.following}</p>
-                    <p className="text-xs text-white/40 mt-1">Developers</p>
+                    <p className="text-white/60 text-sm font-medium">Pull Requests</p>
+                    <p className="text-3xl font-bold text-white mt-1">{totalPRs}</p>
+                    <p className="text-xs text-white/40 mt-1">Created by you</p>
                   </div>
                   <div className="p-3 bg-indigo-500/20 rounded-lg">
-                    <UserPlus className="h-6 w-6 text-indigo-400" />
+                    <GitBranch className="h-6 w-6 text-indigo-400" />
                   </div>
                 </div>
               </CardContent>
