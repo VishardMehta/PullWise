@@ -109,7 +109,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
   }
 
   return (
-    <Card className="bg-black/60 border-white/10 backdrop-blur-sm">
+    <Card className="bg-black/80 border-white/10 backdrop-blur-md">
         <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Code className="h-5 w-5" />
