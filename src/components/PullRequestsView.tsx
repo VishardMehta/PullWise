@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code } from 'lucide-react';
+import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code, RefreshCw } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { CodeAnalysisView } from '@/components/CodeAnalysis/CodeAnalysisView';
 import { MLAnalysisView } from '@/components/MLAnalysis/MLAnalysisView';
@@ -111,13 +111,24 @@ export function PullRequestsView() {
   const [mlAnalysis, setMlAnalysis] = useState<any>(null);
   const [mlError, setMlError] = useState<string | null>(null);
 
-  const analyzePullRequest = async (pr: PullRequest) => {
+  const analyzePullRequest = async (pr: PullRequest, forceRefresh: boolean = false) => {
     try {
-      // Clear previous analysis immediately when switching PRs
+      // Set selected PR immediately
       setSelectedPR(pr);
+      
+      // Initialize services to check cache
+      const analysisService = CodeAnalysisService.getInstance();
+      const mlService = MLAnalysisService.getInstance();
+      
+      // Only clear cache if force refresh is requested
+      if (forceRefresh) {
+        analysisService.clearCache(pr.id.toString());
+        mlService.clearCache();
+        setAnalysisResult(null);
+        setMlAnalysis(null);
+      }
+      
       setAnalysisLoading(true);
-      setAnalysisResult(null); // Clear old analysis
-      setMlAnalysis(null); // Clear old ML analysis
       setError(null);
       setMlError(null);
 
@@ -198,16 +209,8 @@ export function PullRequestsView() {
         additions: commit.stats?.additions || 0,
         deletions: commit.stats?.deletions || 0
       }));
-      
-      // Initialize services
-      const analysisService = CodeAnalysisService.getInstance();
-      const mlService = MLAnalysisService.getInstance();
-      
-      // Clear service caches for this PR to ensure fresh analysis
-      analysisService.clearCache(pr.id.toString());
-      mlService.clearCache();
 
-      // Run both analyses in parallel
+      // Run both analyses in parallel (services already initialized at top)
       const [codeResult, mlResult] = await Promise.all([
         analysisService.analyzeCode({
           pullRequestId: pr.id.toString(),
@@ -316,15 +319,28 @@ export function PullRequestsView() {
                     >
                       #{pr.number} {pr.title}
                     </a>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-2 text-white/60 hover:text-white"
-                      onClick={() => analyzePullRequest(pr)}
-                    >
-                      <Code className="h-4 w-4 mr-1" />
-                      Analyze
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="ml-2 text-white/60 hover:text-white"
+                        onClick={() => analyzePullRequest(pr)}
+                      >
+                        <Code className="h-4 w-4 mr-1" />
+                        Analyze
+                      </Button>
+                      {selectedPR?.id === pr.id && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-white/60 hover:text-white"
+                          onClick={() => analyzePullRequest(pr, true)}
+                          title="Force refresh analysis"
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   
                   {pr.body && (
