@@ -303,65 +303,96 @@ export function PullRequestsView() {
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {pullRequests.map((pr) => (
             <div
               key={pr.id}
-              className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+              className="p-5 bg-gradient-to-br from-white/[0.07] to-white/[0.03] rounded-xl border border-white/10 hover:border-white/20 hover:from-white/[0.1] hover:to-white/[0.05] transition-all duration-200"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    {getStateIcon(pr.state)}
-                    <a
-                      href={pr.html_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-white font-semibold hover:underline"
-                    >
-                      #{pr.number} {pr.title}
-                    </a>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="ml-2 text-white/60 hover:text-white"
-                      onClick={() => analyzePullRequest(pr)}
-                    >
-                      <Code className="h-4 w-4 mr-1" />
-                      Analyze
-                    </Button>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  {/* PR Header */}
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="mt-0.5">
+                      {getStateIcon(pr.state)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <a
+                          href={pr.html_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white font-semibold hover:text-blue-400 transition-colors text-lg"
+                        >
+                          {pr.title}
+                        </a>
+                        <span className="text-white/40 text-sm">#{pr.number}</span>
+                      </div>
+                      
+                      {pr.body && (
+                        <p className="text-white/50 text-sm mt-2 line-clamp-2 leading-relaxed">
+                          {pr.body}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  
-                  {pr.body && (
-                    <p className="text-white/60 text-sm mt-2 line-clamp-2">
-                      {pr.body}
-                    </p>
-                  )}
 
-                  <div className="flex items-center gap-4 mt-3 text-white/60 text-sm">
+                  {/* PR Metadata */}
+                  <div className="flex items-center gap-4 flex-wrap text-white/50 text-xs">
+                    <span className="flex items-center gap-1.5">
+                      <img 
+                        src={pr.user.avatar_url} 
+                        alt={pr.user.login}
+                        className="w-5 h-5 rounded-full ring-1 ring-white/20"
+                      />
+                      <span className="font-medium text-white/70">{pr.user.login}</span>
+                    </span>
+                    <span className="text-white/30">•</span>
                     <span className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {new Date(pr.created_at).toLocaleDateString()}
+                      <Clock className="h-3.5 w-3.5" />
+                      {new Date(pr.created_at).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        year: new Date(pr.created_at).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                      })}
+                    </span>
+                    <span className="text-white/30">•</span>
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      {pr.comments}
+                    </span>
+                    <span className="text-white/30">•</span>
+                    <span className="flex items-center gap-1">
+                      <GitCommit className="h-3.5 w-3.5" />
+                      {pr.commits || 0}
+                    </span>
+                    <span className="text-white/30">•</span>
+                    <span className="flex items-center gap-1">
+                      <Code className="h-3.5 w-3.5 text-green-400" />
+                      +{pr.additions || 0}
                     </span>
                     <span className="flex items-center gap-1">
-                      <MessageSquare className="h-4 w-4" />
-                      {pr.comments} comments
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <GitCommit className="h-4 w-4" />
-                      {pr.commits || 0} commits
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Link className="h-4 w-4" />
-                      by {pr.user.login}
+                      <Code className="h-3.5 w-3.5 text-red-400" />
+                      -{pr.deletions || 0}
                     </span>
                   </div>
                 </div>
+
+                {/* Analyze Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500/50 shrink-0"
+                  onClick={() => analyzePullRequest(pr)}
+                >
+                  <Code className="h-4 w-4 mr-1.5" />
+                  Analyze
+                </Button>
               </div>
 
               {/* If this PR is selected, show the analyses directly below this PR */}
               {selectedPR?.id === pr.id && (
-                <div className="mt-4">
+                <div className="mt-6">
                   <Separator className="my-4 bg-white/10" />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                     <div className="max-h-[800px] overflow-y-auto pr-2 scrollbar-thin">

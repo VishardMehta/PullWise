@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { DottedSurface } from '@/components/DottedSurface';
 import { DashboardHeader } from '@/components/DashboardHeader';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -389,6 +390,8 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
