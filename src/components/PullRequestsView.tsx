@@ -113,7 +113,11 @@ export function PullRequestsView() {
 
   const analyzePullRequest = async (pr: PullRequest) => {
     try {
+      // Clear previous analysis immediately when switching PRs
+      setSelectedPR(pr);
       setAnalysisLoading(true);
+      setAnalysisResult(null); // Clear old analysis
+      setMlAnalysis(null); // Clear old ML analysis
       setError(null);
       setMlError(null);
 
@@ -198,6 +202,10 @@ export function PullRequestsView() {
       // Initialize services
       const analysisService = CodeAnalysisService.getInstance();
       const mlService = MLAnalysisService.getInstance();
+      
+      // Clear service caches for this PR to ensure fresh analysis
+      analysisService.clearCache(pr.id.toString());
+      mlService.clearCache();
 
       // Run both analyses in parallel
       const [codeResult, mlResult] = await Promise.all([
