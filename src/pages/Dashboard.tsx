@@ -626,19 +626,26 @@ const Dashboard = () => {
               </Card>
             </TabsContent>
             <TabsContent value="pull-requests">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <div className="p-2 bg-green-500/20 rounded-lg">
-                      <GitBranch className="h-5 w-5 text-green-400" />
+              <div className="space-y-4">
+                <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <div className="p-2 bg-green-500/20 rounded-lg">
+                        <GitBranch className="h-5 w-5 text-green-400" />
+                      </div>
+                      Pull Requests Analysis
+                      <span className="ml-auto text-sm text-white/60 font-normal">
+                        Analyze any repository
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="px-6 pb-6">
+                      <PullRequestsView />
                     </div>
-                    Pull Requests
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <PullRequestsView />
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
 
