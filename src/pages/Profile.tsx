@@ -319,75 +319,82 @@ const Profile = () => {
                     </div>
                   </>
                 )}
-
-                {userReadme && (
-                  <>
-                    <Separator className="my-6 bg-white/10" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-white mb-4">
-                        Profile README
-                      </h3>
-                      <div className="bg-black/30 rounded-lg p-4 max-h-96 overflow-y-auto">
-                        <div className="prose prose-invert max-w-none text-sm">
-                        <ReactMarkdown
-                          // enable GitHub-flavored markdown (tables, tasklists, strikethrough)
-                          remarkPlugins={[remarkGfm]}
-                          // allow HTML inside markdown (use sanitize if content is untrusted)
-                          rehypePlugins={[[rehypeRaw], [rehypeSanitize]]}
-                          components={{
-                            h1: ({ ...props }) => <h1 className="text-3xl font-bold text-white mt-6 mb-3 border-b border-white/10 pb-2" {...props} />,
-                            h2: ({ ...props }) => <h2 className="text-2xl font-bold text-white mt-5 mb-2 border-b border-white/10 pb-2" {...props} />,
-                            // ...rest of your custom components...
-                            code: ({ inline, className, children, ...props }: any) =>
-                              inline ? (
-                                <code className="bg-white/10 text-orange-300 px-1 py-0.5 rounded text-xs font-mono" {...props}>
-                                  {children}
-                                </code>
-                              ) : (
-                                <pre className="block bg-black/50 text-green-300 p-3 rounded my-2 overflow-x-auto font-mono text-xs" {...props}>
-                                  <code className={className}>{children}</code>
-                                </pre>
-                              ),
-                            a: ({ href, ...props }) => (
-                              <a
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 underline"
-                                {...props}
-                              />
-                            ),
-                            img: ({ src, alt, ...props }) => (
-                              <img src={src} alt={alt} className="max-w-full rounded my-2" {...props} />
-                            ),
-                            // etc...
-                          }}
-                        >
-                          {userReadme}
-                        </ReactMarkdown>
-
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {!userReadme && !readmeLoading && (
-                  <>
-                    <Separator className="my-6 bg-white/10" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-white mb-4">
-                        Profile README
-                      </h3>
-                      <p className="text-white/60 text-sm">
-                        No README found. Create a repository named <Badge className="bg-white/20 text-white">{profile.github_username}</Badge> with a README.md file to display your profile here.
-                      </p>
-                    </div>
-                  </>
-                )}
               </CardContent>
             </Card>
           </div>
+
+          {/* README Section - Full Width Below */}
+          {userReadme && (
+            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-2xl">Profile README</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-black/30 rounded-lg p-6">
+                  <div className="prose prose-invert max-w-none">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[[rehypeRaw], [rehypeSanitize]]}
+                      components={{
+                        h1: ({ ...props }) => <h1 className="text-3xl font-bold text-white mt-6 mb-3 border-b border-white/10 pb-2" {...props} />,
+                        h2: ({ ...props }) => <h2 className="text-2xl font-bold text-white mt-5 mb-2 border-b border-white/10 pb-2" {...props} />,
+                        h3: ({ ...props }) => <h3 className="text-xl font-semibold text-white mt-4 mb-2" {...props} />,
+                        p: ({ ...props }) => <p className="text-white/80 my-3 leading-relaxed" {...props} />,
+                        ul: ({ ...props }) => <ul className="list-disc list-inside text-white/80 my-3 space-y-1" {...props} />,
+                        ol: ({ ...props }) => <ol className="list-decimal list-inside text-white/80 my-3 space-y-1" {...props} />,
+                        li: ({ ...props }) => <li className="text-white/80" {...props} />,
+                        blockquote: ({ ...props }) => <blockquote className="border-l-4 border-white/20 pl-4 italic text-white/70 my-3" {...props} />,
+                        code: ({ inline, className, children, ...props }: any) =>
+                          inline ? (
+                            <code className="bg-white/10 text-orange-300 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+                              {children}
+                            </code>
+                          ) : (
+                            <pre className="block bg-black/50 text-green-300 p-3 rounded my-2 overflow-x-auto font-mono text-xs" {...props}>
+                              <code className={className}>{children}</code>
+                            </pre>
+                          ),
+                        a: ({ href, ...props }) => (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 underline"
+                            {...props}
+                          />
+                        ),
+                        img: ({ src, alt, ...props }) => (
+                          <img src={src} alt={alt} className="max-w-full rounded my-4" {...props} />
+                        ),
+                        table: ({ ...props }) => (
+                          <div className="overflow-x-auto my-4">
+                            <table className="min-w-full border border-white/10" {...props} />
+                          </div>
+                        ),
+                        th: ({ ...props }) => <th className="border border-white/10 px-4 py-2 bg-white/5 text-white font-semibold" {...props} />,
+                        td: ({ ...props }) => <td className="border border-white/10 px-4 py-2 text-white/80" {...props} />,
+                      }}
+                    >
+                      {userReadme}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {!userReadme && !readmeLoading && (
+            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white text-2xl">Profile README</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-white/60 text-sm">
+                  No README found. Create a repository named <Badge className="bg-white/20 text-white">{profile.github_username}</Badge> with a README.md file to display your profile here.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
       
