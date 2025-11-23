@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code, RefreshCw } from 'lucide-react';
+import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { CodeAnalysisView } from '@/components/CodeAnalysis/CodeAnalysisView';
 import { MLAnalysisView } from '@/components/MLAnalysis/MLAnalysisView';
@@ -319,28 +319,15 @@ export function PullRequestsView() {
                     >
                       #{pr.number} {pr.title}
                     </a>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="ml-2 text-white/60 hover:text-white"
-                        onClick={() => analyzePullRequest(pr)}
-                      >
-                        <Code className="h-4 w-4 mr-1" />
-                        Analyze
-                      </Button>
-                      {selectedPR?.id === pr.id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-white/60 hover:text-white"
-                          onClick={() => analyzePullRequest(pr, true)}
-                          title="Force refresh analysis"
-                        >
-                          <RefreshCw className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 text-white/60 hover:text-white"
+                      onClick={() => analyzePullRequest(pr)}
+                    >
+                      <Code className="h-4 w-4 mr-1" />
+                      Analyze
+                    </Button>
                   </div>
                   
                   {pr.body && (
