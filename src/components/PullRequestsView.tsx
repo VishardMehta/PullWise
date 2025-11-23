@@ -237,6 +237,7 @@ export function PullRequestsView() {
           }))
         }).catch(error => {
           // Handle ML analysis errors separately
+          console.error('ML Analysis Error:', error);
           if (error.message.includes('API key not configured')) {
             setMlError('Gemini API key not configured. Please add it in your profile settings.');
           } else {
@@ -246,6 +247,7 @@ export function PullRequestsView() {
         })
       ]);
 
+      console.log('Analysis Results:', { codeResult, mlResult });
       setAnalysisResult(codeResult);
       setMlAnalysis(mlResult);
     } catch (err) {

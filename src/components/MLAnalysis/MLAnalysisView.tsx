@@ -39,7 +39,19 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
     );
   }
 
-  if (!analysis) return null;
+  if (!analysis) {
+    return (
+      <Card className="p-6 space-y-4 bg-white/5 border-white/10">
+        <div className="flex items-center gap-2">
+          <Brain className="h-5 w-5 text-purple-400" />
+          <h3 className="text-lg font-semibold text-white">AI Code Review</h3>
+        </div>
+        <div className="text-white/60 text-center py-8">
+          No ML analysis data available
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 space-y-6 bg-white/5 border-white/10">
