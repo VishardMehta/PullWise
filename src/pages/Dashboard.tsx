@@ -435,37 +435,72 @@ const Dashboard = () => {
                       <Code2 className="h-5 w-5 text-purple-400" />
                     </div>
                     Language Distribution
+                    <span className="ml-auto text-sm text-white/60 font-normal">
+                      {languageData.length} languages
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <PieChart>
-                      <Pie
-                        data={languageData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                        outerRadius={120}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {languageData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {languageData.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Pie Chart */}
+                      <ResponsiveContainer width="100%" height={350}>
+                        <PieChart>
+                          <Pie
+                            data={languageData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) =>
+                              percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : ''
+                            }
+                            outerRadius={100}
+                            innerRadius={40}
+                            fill="#8884d8"
+                            dataKey="value"
+                            paddingAngle={2}
+                          >
+                            {languageData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                              border: '1px solid rgba(255, 255, 255, 0.2)',
+                              borderRadius: '8px',
+                              color: 'white',
+                            }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      
+                      {/* Legend List */}
+                      <div className="flex flex-col justify-center space-y-2">
+                        {languageData
+                          .sort((a, b) => b.value - a.value)
+                          .map((lang, index) => (
+                          <div key={index} className="flex items-center justify-between p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-4 h-4 rounded-full" 
+                                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                              />
+                              <span className="text-white text-sm font-medium">{lang.name}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-white/60 text-sm">{lang.value} repos</span>
+                              <span className="text-white font-semibold text-sm">
+                                {((lang.value / repositories.length) * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          </div>
                         ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
-                          color: 'white',
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-white/60 text-center py-8">No language data available</div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -478,32 +513,54 @@ const Dashboard = () => {
                       <Star className="h-5 w-5 text-yellow-400" />
                     </div>
                     Top Repositories by Stars
+                    <span className="ml-auto text-sm text-white/60 font-normal">
+                      Top {Math.min(10, topRepos.length)}
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={topRepos}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                      <XAxis
-                        dataKey="name"
-                        stroke="rgba(255,255,255,0.6)"
-                        tick={{ fontSize: 12 }}
-                        angle={-45}
-                        textAnchor="end"
-                        height={100}
-                      />
-                      <YAxis stroke="rgba(255,255,255,0.6)" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
-                          color: 'white',
-                        }}
-                      />
-                      <Bar dataKey="stargazers_count" fill="#fbbf24" radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {topRepos.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={450}>
+                      <BarChart data={topRepos} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                        <defs>
+                          <linearGradient id="starGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#fbbf24" stopOpacity={0.8}/>
+                            <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                        <XAxis
+                          dataKey="name"
+                          stroke="rgba(255,255,255,0.6)"
+                          tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.8)' }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={100}
+                        />
+                        <YAxis 
+                          stroke="rgba(255,255,255,0.6)" 
+                          tick={{ fill: 'rgba(255,255,255,0.8)' }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                            border: '1px solid rgba(251, 191, 36, 0.3)',
+                            borderRadius: '8px',
+                            color: 'white',
+                          }}
+                          cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                        />
+                        <Bar 
+                          dataKey="stargazers_count" 
+                          fill="url(#starGradient)" 
+                          radius={[8, 8, 0, 0]}
+                          maxBarSize={60}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-white/60 text-center py-8">No repository data available</div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -516,29 +573,55 @@ const Dashboard = () => {
                       <HardDrive className="h-5 w-5 text-blue-400" />
                     </div>
                     Repository Sizes (MB)
+                    <span className="ml-auto text-sm text-white/60 font-normal">
+                      Top {Math.min(8, sizeData.length)}
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={400}>
-                    <BarChart data={sizeData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                      <XAxis
-                        dataKey="name"
-                        stroke="rgba(255,255,255,0.6)"
-                        tick={{ fontSize: 12 }}
-                      />
-                      <YAxis stroke="rgba(255,255,255,0.6)" />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
-                          color: 'white',
-                        }}
-                      />
-                      <Bar dataKey="size" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {sizeData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={450}>
+                      <BarChart data={sizeData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }} layout="horizontal">
+                        <defs>
+                          <linearGradient id="sizeGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                            <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.4}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                        <XAxis
+                          dataKey="name"
+                          stroke="rgba(255,255,255,0.6)"
+                          tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.8)' }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={80}
+                        />
+                        <YAxis 
+                          stroke="rgba(255,255,255,0.6)"
+                          tick={{ fill: 'rgba(255,255,255,0.8)' }}
+                          label={{ value: 'MB', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                            border: '1px solid rgba(59, 130, 246, 0.3)',
+                            borderRadius: '8px',
+                            color: 'white',
+                          }}
+                          cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                        />
+                        <Bar 
+                          dataKey="size" 
+                          fill="url(#sizeGradient)" 
+                          radius={[8, 8, 0, 0]}
+                          maxBarSize={60}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="text-white/60 text-center py-8">No repository size data available</div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
