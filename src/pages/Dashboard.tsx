@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { PullRequestsView } from '@/components/PullRequestsView';
 import { DottedSurface } from '@/components/DottedSurface';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -226,43 +227,13 @@ const Dashboard = () => {
       <DottedSurface />
 
       <div className="relative z-10">
+        <DashboardHeader 
+          profile={profile} 
+          currentPage="dashboard" 
+          onSignOut={signOut}
+        />
+        
         <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={profile.avatar_url} alt={profile.name} />
-                <AvatarFallback>
-                  {profile.name?.charAt(0) || profile.github_username?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-3xl font-bold text-white">
-                  {profile.name || profile.github_username}
-                </h1>
-                <p className="text-white/60">@{profile.github_username}</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => navigate('/profile')}
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </Button>
-              <Button
-                onClick={signOut}
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
-
           {/* Stats Overview - Enhanced with 8 cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Repositories */}

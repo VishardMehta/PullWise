@@ -3,13 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { MLAnalysisService } from '@/services/MLAnalysisService';
 import { DottedSurface } from '@/components/DottedSurface';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -53,64 +52,14 @@ const Profile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [geminiKey, setGeminiKey] = useState('');
-  const [savingKey, setSavingKey] = useState(false);
-  const [keyError, setKeyError] = useState<string | null>(null);
-  const [keySuccess, setKeySuccess] = useState<string | null>(null);
   const [userReadme, setUserReadme] = useState<string | null>(null);
   const [readmeLoading, setReadmeLoading] = useState(false);
-
-  // Function to save the Gemini API key
-  const saveGeminiKey = async () => {
-    if (!geminiKey.trim()) {
-      setKeyError('Please enter an API key');
-      return;
-    }
-
-    setSavingKey(true);
-    setKeyError(null);
-    setKeySuccess(null);
-
-    try {
-      const mlService = MLAnalysisService.getInstance();
-      await mlService.setApiKey(geminiKey.trim());
-      setKeySuccess('API key saved successfully!');
-      setTimeout(() => setKeySuccess(null), 3000); // Clear success message after 3 seconds
-    } catch (error) {
-      setKeyError(error instanceof Error ? error.message : 'Failed to save API key');
-    } finally {
-      setSavingKey(false);
-    }
-  };
 
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth');
     }
   }, [user, authLoading, navigate]);
-
-  // Load existing Gemini API key
-  useEffect(() => {
-    const loadApiKey = async () => {
-      if (!user) return;
-
-      try {
-        const { data } = await supabase
-          .from('user_settings')
-          .select('gemini_api_key')
-          .eq('user_id', user.id)
-          .single();
-
-        if (data?.gemini_api_key) {
-          setGeminiKey(data.gemini_api_key);
-        }
-      } catch (error) {
-        console.error('Error loading API key:', error);
-      }
-    };
-
-    loadApiKey();
-  }, [user]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -205,28 +154,13 @@ const Profile = () => {
       <DottedSurface />
 
       <div className="relative z-10">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-white">GitHub Profile</h1>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => navigate('/dashboard')}
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                Dashboard
-              </Button>
-              <Button
-                onClick={signOut}
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-              </Button>
-            </div>
-          </div>
+        <DashboardHeader 
+          profile={profile} 
+          currentPage="profile" 
+          onSignOut={signOut}
+        />
 
+        <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-1 bg-white/5 border-white/10 backdrop-blur-sm">
               <CardContent className="pt-6">
@@ -307,25 +241,33 @@ const Profile = () => {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                   <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <GitFork className="h-6 w-6 text-white/70 mx-auto mb-2" />
+                    <div className="h-12 w-12 rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-3">
+                      <GitFork className="h-6 w-6 text-purple-400" />
+                    </div>
                     <p className="text-2xl font-bold text-white">{profile.public_repos}</p>
                     <p className="text-sm text-white/60">Repositories</p>
                   </div>
 
                   <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <FileText className="h-6 w-6 text-white/70 mx-auto mb-2" />
+                    <div className="h-12 w-12 rounded-lg bg-yellow-500/20 flex items-center justify-center mx-auto mb-3">
+                      <FileText className="h-6 w-6 text-yellow-400" />
+                    </div>
                     <p className="text-2xl font-bold text-white">{profile.public_gists}</p>
                     <p className="text-sm text-white/60">Gists</p>
                   </div>
 
                   <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <Users className="h-6 w-6 text-white/70 mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-white">{profile.followers}</p>
+                    <div className="h-12 w-12 rounded-lg bg-pink-500/20 flex items-center justify-center mx-auto mb-3">
+                      <Users className="h-6 w-6 text-pink-400" />
+                    </div>
+                    <p className="text-2xl font-bold text-white">{profile.public_repos}</p>
                     <p className="text-sm text-white/60">Followers</p>
                   </div>
 
                   <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <UserPlus className="h-6 w-6 text-white/70 mx-auto mb-2" />
+                    <div className="h-12 w-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mx-auto mb-3">
+                      <UserPlus className="h-6 w-6 text-indigo-400" />
+                    </div>
                     <p className="text-2xl font-bold text-white">{profile.following}</p>
                     <p className="text-sm text-white/60">Following</p>
                   </div>
