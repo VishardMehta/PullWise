@@ -15,7 +15,7 @@ interface MLAnalysisViewProps {
 export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps) {
   if (loading) {
     return (
-      <Card className="p-6 space-y-4 bg-white/5 border-white/10">
+      <Card className="p-6 space-y-4 bg-black/60 border-white/10 backdrop-blur-sm">
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-white/10 rounded w-1/4"></div>
           <div className="h-24 bg-white/10 rounded"></div>
@@ -30,7 +30,7 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
 
   if (error) {
     return (
-      <Card className="p-6 space-y-4 bg-white/5 border-white/10">
+      <Card className="p-6 space-y-4 bg-black/60 border-white/10 backdrop-blur-sm">
         <div className="flex items-center gap-2 text-yellow-500">
           <AlertCircle className="h-5 w-5" />
           <span>{error}</span>
@@ -41,7 +41,7 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
 
   if (!analysis) {
     return (
-      <Card className="p-6 space-y-4 bg-white/5 border-white/10">
+      <Card className="p-6 space-y-4 bg-black/60 border-white/10 backdrop-blur-sm">
         <div className="flex items-center gap-2">
           <Brain className="h-5 w-5 text-purple-400" />
           <h3 className="text-lg font-semibold text-white">AI Code Review</h3>
@@ -54,7 +54,7 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
   }
 
   return (
-    <Card className="p-6 space-y-6 bg-white/5 border-white/10">
+    <Card className="p-6 space-y-6 bg-black/60 border-white/10 backdrop-blur-sm">
       <div className="flex items-center gap-2">
         <Brain className="h-5 w-5 text-purple-400" />
         <h3 className="text-lg font-semibold text-white">AI Code Review</h3>
