@@ -222,6 +222,7 @@ RETURN ONLY THE JSON OBJECT. NO EXPLANATIONS.
     });
 
     if (this.analysisCache.has(cacheKey)) {
+      console.log('--- Returning cached ML analysis ---');
       return this.analysisCache.get(cacheKey)!;
     }
 
@@ -230,6 +231,9 @@ RETURN ONLY THE JSON OBJECT. NO EXPLANATIONS.
 
       // Send prompt and receive response (raw or parsed)
       const response = await this.callAnalyzeEndpoint(prompt);
+      
+      console.log('--- Full API Response ---');
+      console.log(JSON.stringify(response, null, 2));
 
       // --- Robust extraction / unwrapping of provider response shapes ---
       let rawText: string | null = null;
@@ -340,6 +344,9 @@ RETURN ONLY THE JSON OBJECT. NO EXPLANATIONS.
         suggestedPatches: analysisObj.suggestedPatches,
         explanation: analysisObj.explanation
       };
+
+      console.log('--- Final normalized analysis object ---');
+      console.log(JSON.stringify(analysis, null, 2));
 
       this.analysisCache.set(cacheKey, analysis);
       return analysis;
