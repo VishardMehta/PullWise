@@ -325,7 +325,7 @@ const Profile = () => {
 
           {/* README Section - Full Width Below */}
           {userReadme && (
-            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
+            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm max-w-5xl mx-auto">
               <CardHeader>
                 <CardTitle className="text-white text-2xl">Profile README</CardTitle>
               </CardHeader>
@@ -384,7 +384,7 @@ const Profile = () => {
           )}
 
           {!userReadme && !readmeLoading && (
-            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
+            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm max-w-5xl mx-auto">
               <CardHeader>
                 <CardTitle className="text-white text-2xl">Profile README</CardTitle>
               </CardHeader>
