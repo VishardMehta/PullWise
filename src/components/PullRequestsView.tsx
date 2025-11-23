@@ -320,10 +320,7 @@ export function PullRequestsView() {
                       variant="ghost"
                       size="sm"
                       className="ml-2 text-white/60 hover:text-white"
-                      onClick={() => {
-                        setSelectedPR(pr);
-                        analyzePullRequest(pr);
-                      }}
+                      onClick={() => analyzePullRequest(pr)}
                     >
                       <Code className="h-4 w-4 mr-1" />
                       Analyze
