@@ -366,15 +366,6 @@ export function PullRequestsView() {
                       <GitCommit className="h-3.5 w-3.5" />
                       {pr.commits || 0}
                     </span>
-                    <span className="text-white/30">•</span>
-                    <span className="flex items-center gap-1">
-                      <Code className="h-3.5 w-3.5 text-green-400" />
-                      +{pr.additions || 0}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Code className="h-3.5 w-3.5 text-red-400" />
-                      -{pr.deletions || 0}
-                    </span>
                   </div>
                 </div>
 
