@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { AlertCircle, CheckCircle, Code, FileWarning } from 'lucide-react';
+import { AlertCircle, CheckCircle, Code, FileWarning, AlertTriangle, Lock, Zap, Copy } from 'lucide-react';
 
 interface CodeIssue {
   type: 'error' | 'warning' | 'suggestion';
@@ -48,7 +48,18 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
     }
   };
 
-  const getIssueIcon = (type: CodeIssue['type']) => {
+  const getIssueIcon = (type: CodeIssue['type'], message?: string) => {
+    // Security-specific icons
+    if (message?.includes('security') || message?.includes('Secret') || message?.includes('Injection') || message?.includes('XSS')) {
+      return <Lock className="h-4 w-4 text-red-500" />;
+    }
+    if (message?.includes('complexity') || message?.includes('performance') || message?.includes('Performance')) {
+      return <Zap className="h-4 w-4 text-yellow-500" />;
+    }
+    if (message?.includes('duplication') || message?.includes('Duplicate')) {
+      return <Copy className="h-4 w-4 text-blue-500" />;
+    }
+    
     switch (type) {
       case 'error':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
@@ -106,30 +117,61 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Metrics Overview */}
+        {/* Metrics Overview - Enhanced */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white/5 rounded-lg p-4 min-w-0">
-            <div className="text-sm text-white/60">Complexity</div>
+          {/* Complexity Score */}
+          <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <span className="text-sm text-white/60">Complexity</span>
+            </div>
             <div className="text-2xl font-bold text-white mt-1 truncate">
-              {Number.isFinite(analysis.metrics.complexity) ? analysis.metrics.complexity.toFixed(2) : 'N/A'}
+              {Number.isFinite(analysis.metrics.complexity) ? analysis.metrics.complexity.toFixed(0) : 'N/A'}
+            </div>
+            <div className="text-xs text-white/40 mt-1">
+              {analysis.metrics.complexity > 15 ? '⚠️ Critical' : analysis.metrics.complexity > 7 ? '⚠️ High' : '✅ Good'}
             </div>
           </div>
-          <div className="bg-white/5 rounded-lg p-4 min-w-0">
-            <div className="text-sm text-white/60">Coverage</div>
+          
+          {/* Coverage */}
+          <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span className="text-sm text-white/60">Coverage</span>
+            </div>
             <div className="text-2xl font-bold text-white mt-1 truncate">
               {Number.isFinite(analysis.metrics.coverage) ? Math.round(analysis.metrics.coverage) + '%' : 'N/A'}
             </div>
+            <div className="text-xs text-white/40 mt-1">Test coverage</div>
           </div>
-          <div className="bg-white/5 rounded-lg p-4 min-w-0">
-            <div className="text-sm text-white/60">Duplications</div>
+          
+          {/* Duplications */}
+          <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-2 mb-2">
+              <Copy className="h-4 w-4 text-blue-500" />
+              <span className="text-sm text-white/60">Duplication</span>
+            </div>
             <div className="text-2xl font-bold text-white mt-1 truncate">
               {Number.isFinite(analysis.metrics.duplications) ? Math.round(analysis.metrics.duplications) + '%' : 'N/A'}
             </div>
+            <div className="text-xs text-white/40 mt-1">Code copy-paste</div>
           </div>
-          <div className="bg-white/5 rounded-lg p-4 min-w-0">
-            <div className="text-sm text-white/60">Issues</div>
+          
+          {/* Total Issues */}
+          <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <span className="text-sm text-white/60">Issues</span>
+            </div>
             <div className="text-2xl font-bold text-white mt-1 truncate">
               {analysis.metrics.issues.errors + analysis.metrics.issues.warnings + analysis.metrics.issues.suggestions}
+            </div>
+            <div className="text-xs text-white/40 mt-1">
+              <span className="text-red-400">🔴 {analysis.metrics.issues.errors}</span>
+              <span className="mx-1 text-white/40">·</span>
+              <span className="text-yellow-400">🟡 {analysis.metrics.issues.warnings}</span>
+              <span className="mx-1 text-white/40">·</span>
+              <span className="text-blue-400">🔵 {analysis.metrics.issues.suggestions}</span>
             </div>
           </div>
         </div>
@@ -137,39 +179,46 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
         {/* Issues List */}
         <ScrollArea className="h-[400px] pr-4">
           <div className="space-y-4">
-            {analysis.issues.map((issue, index) => (
-              <div
-                key={index}
-                className="p-4 bg-white/5 rounded-lg border border-white/10"
-              >
-                <div className="flex items-start gap-3">
-                  {getIssueIcon(issue.type)}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-white font-medium">{issue.file}</span>
-                      <span className="text-white/40">Line {issue.line}</span>
-                      <Badge
-                        className={`ml-auto ${getSeverityColor(issue.severity)}`}
-                      >
-                        {issue.severity}
-                      </Badge>
-                    </div>
-                    <p className="text-white/80 mb-2">{issue.message}</p>
-                    {issue.suggestion && (
-                      <div className="bg-white/5 p-3 rounded border border-white/10">
-                        <div className="flex items-center gap-2 mb-1">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span className="text-white/60 text-sm">Suggested Fix:</span>
-                        </div>
-                        <code className="text-sm text-white/80 font-mono">
-                          {issue.suggestion}
-                        </code>
+            {analysis.issues.length === 0 ? (
+              <div className="text-center py-8 text-green-400">
+                <CheckCircle className="h-8 w-8 mx-auto mb-2" />
+                <p className="text-sm">✨ No issues found! Code looks great.</p>
+              </div>
+            ) : (
+              analysis.issues.map((issue, index) => (
+                <div
+                  key={index}
+                  className="p-4 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    {getIssueIcon(issue.type, issue.message)}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-white font-medium text-sm">{issue.file}</span>
+                        <span className="text-white/40 text-xs">Line {issue.line}</span>
+                        <Badge
+                          className={`ml-auto text-xs ${getSeverityColor(issue.severity)}`}
+                        >
+                          {issue.severity === 'high' && '🔴'} {issue.severity === 'medium' && '🟡'} {issue.severity === 'low' && '🔵'} {issue.severity}
+                        </Badge>
                       </div>
-                    )}
+                      <p className="text-white/80 text-sm mb-2 font-medium">{issue.message}</p>
+                      {issue.suggestion && (
+                        <div className="bg-white/5 p-3 rounded border border-white/10 mt-2">
+                          <div className="flex items-center gap-2 mb-1">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            <span className="text-white/60 text-xs font-semibold">Suggested Fix:</span>
+                          </div>
+                          <p className="text-xs text-white/70 leading-relaxed">
+                            {issue.suggestion}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </ScrollArea>
       </CardContent>
