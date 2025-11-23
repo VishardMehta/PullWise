@@ -266,13 +266,13 @@ const Dashboard = () => {
           {/* Stats Overview - Enhanced with 8 cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Repositories */}
-            <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20 backdrop-blur-sm hover:border-purple-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Repositories</p>
                     <p className="text-3xl font-bold text-white mt-1">{repositories.length}</p>
-                    <p className="text-xs text-purple-400 mt-1">Public repos</p>
+                    <p className="text-xs text-white/40 mt-1">Public repos</p>
                   </div>
                   <div className="p-3 bg-purple-500/20 rounded-lg">
                     <GitBranch className="h-6 w-6 text-purple-400" />
@@ -282,13 +282,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Total Stars */}
-            <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20 backdrop-blur-sm hover:border-yellow-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Total Stars</p>
                     <p className="text-3xl font-bold text-white mt-1">{totalStars}</p>
-                    <p className="text-xs text-yellow-400 mt-1">Across all repos</p>
+                    <p className="text-xs text-white/40 mt-1">Across all repos</p>
                   </div>
                   <div className="p-3 bg-yellow-500/20 rounded-lg">
                     <Star className="h-6 w-6 text-yellow-400" />
@@ -298,13 +298,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Total Forks */}
-            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20 backdrop-blur-sm hover:border-blue-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Total Forks</p>
                     <p className="text-3xl font-bold text-white mt-1">{totalForks}</p>
-                    <p className="text-xs text-blue-400 mt-1">Community forks</p>
+                    <p className="text-xs text-white/40 mt-1">Community forks</p>
                   </div>
                   <div className="p-3 bg-blue-500/20 rounded-lg">
                     <GitFork className="h-6 w-6 text-blue-400" />
@@ -314,13 +314,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Avg Stars */}
-            <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20 backdrop-blur-sm hover:border-green-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Avg Stars</p>
                     <p className="text-3xl font-bold text-white mt-1">{avgStars}</p>
-                    <p className="text-xs text-green-400 mt-1">Per repository</p>
+                    <p className="text-xs text-white/40 mt-1">Per repository</p>
                   </div>
                   <div className="p-3 bg-green-500/20 rounded-lg">
                     <TrendingUp className="h-6 w-6 text-green-400" />
@@ -330,13 +330,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Followers */}
-            <Card className="bg-gradient-to-br from-pink-500/10 to-pink-600/5 border-pink-500/20 backdrop-blur-sm hover:border-pink-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Followers</p>
                     <p className="text-3xl font-bold text-white mt-1">{profile.followers}</p>
-                    <p className="text-xs text-pink-400 mt-1">GitHub followers</p>
+                    <p className="text-xs text-white/40 mt-1">GitHub followers</p>
                   </div>
                   <div className="p-3 bg-pink-500/20 rounded-lg">
                     <Users className="h-6 w-6 text-pink-400" />
@@ -346,13 +346,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Following */}
-            <Card className="bg-gradient-to-br from-indigo-500/10 to-indigo-600/5 border-indigo-500/20 backdrop-blur-sm hover:border-indigo-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Following</p>
                     <p className="text-3xl font-bold text-white mt-1">{profile.following}</p>
-                    <p className="text-xs text-indigo-400 mt-1">Developers</p>
+                    <p className="text-xs text-white/40 mt-1">Developers</p>
                   </div>
                   <div className="p-3 bg-indigo-500/20 rounded-lg">
                     <UserPlus className="h-6 w-6 text-indigo-400" />
@@ -362,13 +362,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Total Watchers */}
-            <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border-cyan-500/20 backdrop-blur-sm hover:border-cyan-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Watchers</p>
                     <p className="text-3xl font-bold text-white mt-1">{totalWatchers}</p>
-                    <p className="text-xs text-cyan-400 mt-1">Watching repos</p>
+                    <p className="text-xs text-white/40 mt-1">Watching repos</p>
                   </div>
                   <div className="p-3 bg-cyan-500/20 rounded-lg">
                     <Eye className="h-6 w-6 text-cyan-400" />
@@ -378,13 +378,13 @@ const Dashboard = () => {
             </Card>
 
             {/* Total Code Size */}
-            <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20 backdrop-blur-sm hover:border-orange-500/40 transition-all">
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-white/60 text-sm font-medium">Code Size</p>
                     <p className="text-3xl font-bold text-white mt-1">{totalSizeMB}</p>
-                    <p className="text-xs text-orange-400 mt-1">MB total</p>
+                    <p className="text-xs text-white/40 mt-1">MB total</p>
                   </div>
                   <div className="p-3 bg-orange-500/20 rounded-lg">
                     <HardDrive className="h-6 w-6 text-orange-400" />
