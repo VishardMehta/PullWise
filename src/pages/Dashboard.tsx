@@ -525,32 +525,48 @@ const Dashboard = () => {
             </TabsContent>
           </Tabs>
 
-          {/* Recent Repositories */}
+          {/* Recent Repositories - Most Recently Committed */}
           <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-white">Recent Repositories</CardTitle>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-blue-400" />
+                Recent Activity
+                <span className="text-sm text-white/60 font-normal ml-2">
+                  (Most recently committed)
+                </span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {repositories.slice(0, 5).map((repo) => (
+                {repositories
+                  .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+                  .slice(0, 8)
+                  .map((repo, index) => (
                   <div
                     key={repo.id}
-                    className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                    className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all group"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <a
-                          href={repo.html_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-white font-semibold hover:underline"
-                        >
-                          {repo.name}
-                        </a>
-                        <p className="text-white/60 text-sm mt-1">
+                        <div className="flex items-center gap-2">
+                          {index < 3 && (
+                            <span className="px-2 py-0.5 text-xs font-bold bg-blue-500/20 text-blue-400 rounded-full border border-blue-500/30">
+                              #{index + 1}
+                            </span>
+                          )}
+                          <a
+                            href={repo.html_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-white font-semibold hover:text-blue-400 transition-colors"
+                          >
+                            {repo.name}
+                          </a>
+                        </div>
+                        <p className="text-white/60 text-sm mt-1 line-clamp-2">
                           {repo.description || 'No description'}
                         </p>
-                        <div className="flex items-center gap-4 mt-3 text-white/60 text-sm">
+                        <div className="flex items-center gap-4 mt-3 text-white/60 text-sm flex-wrap">
                           {repo.language && (
                             <span className="flex items-center gap-1">
                               <Code2 className="h-4 w-4" />
@@ -565,9 +581,13 @@ const Dashboard = () => {
                             <GitFork className="h-4 w-4" />
                             {repo.forks_count}
                           </span>
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 text-blue-400">
                             <Calendar className="h-4 w-4" />
-                            {new Date(repo.updated_at).toLocaleDateString()}
+                            Updated {new Date(repo.updated_at).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric',
+                              year: new Date(repo.updated_at).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                            })}
                           </span>
                         </div>
                       </div>
