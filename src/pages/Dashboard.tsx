@@ -397,16 +397,32 @@ const Dashboard = () => {
           {/* Charts Section */}
           <Tabs defaultValue="languages" className="w-full">
             <TabsList className="bg-white/5 border-white/10 mb-6">
-              <TabsTrigger value="languages" className="data-[state=active]:bg-white/10">
+              <TabsTrigger 
+                value="languages" 
+                className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400 transition-colors"
+              >
+                <Code2 className="h-4 w-4 mr-2" />
                 Languages
               </TabsTrigger>
-              <TabsTrigger value="top-repos" className="data-[state=active]:bg-white/10">
+              <TabsTrigger 
+                value="top-repos" 
+                className="data-[state=active]:bg-yellow-500/20 data-[state=active]:text-yellow-400 transition-colors"
+              >
+                <Star className="h-4 w-4 mr-2" />
                 Top Repositories
               </TabsTrigger>
-              <TabsTrigger value="size" className="data-[state=active]:bg-white/10">
+              <TabsTrigger 
+                value="size" 
+                className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-400 transition-colors"
+              >
+                <HardDrive className="h-4 w-4 mr-2" />
                 Repository Sizes
               </TabsTrigger>
-              <TabsTrigger value="pull-requests" className="data-[state=active]:bg-white/10">
+              <TabsTrigger 
+                value="pull-requests" 
+                className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400 transition-colors"
+              >
+                <GitBranch className="h-4 w-4 mr-2" />
                 Pull Requests
               </TabsTrigger>
             </TabsList>
@@ -415,7 +431,9 @@ const Dashboard = () => {
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Code2 className="h-5 w-5" />
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <Code2 className="h-5 w-5 text-purple-400" />
+                    </div>
                     Language Distribution
                   </CardTitle>
                 </CardHeader>
@@ -440,7 +458,7 @@ const Dashboard = () => {
                       </Pie>
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
                           border: '1px solid rgba(255, 255, 255, 0.1)',
                           borderRadius: '8px',
                           color: 'white',
@@ -456,7 +474,9 @@ const Dashboard = () => {
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <Star className="h-5 w-5" />
+                    <div className="p-2 bg-yellow-500/20 rounded-lg">
+                      <Star className="h-5 w-5 text-yellow-400" />
+                    </div>
                     Top Repositories by Stars
                   </CardTitle>
                 </CardHeader>
@@ -475,7 +495,7 @@ const Dashboard = () => {
                       <YAxis stroke="rgba(255,255,255,0.6)" />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
                           border: '1px solid rgba(255, 255, 255, 0.1)',
                           borderRadius: '8px',
                           color: 'white',
@@ -492,7 +512,9 @@ const Dashboard = () => {
               <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
-                    <GitBranch className="h-5 w-5" />
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <HardDrive className="h-5 w-5 text-blue-400" />
+                    </div>
                     Repository Sizes (MB)
                   </CardTitle>
                 </CardHeader>
@@ -508,7 +530,7 @@ const Dashboard = () => {
                       <YAxis stroke="rgba(255,255,255,0.6)" />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                          backgroundColor: 'rgba(0, 0, 0, 0.9)',
                           border: '1px solid rgba(255, 255, 255, 0.1)',
                           borderRadius: '8px',
                           color: 'white',
@@ -521,7 +543,19 @@ const Dashboard = () => {
               </Card>
             </TabsContent>
             <TabsContent value="pull-requests">
-              <PullRequestsView />
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <div className="p-2 bg-green-500/20 rounded-lg">
+                      <GitBranch className="h-5 w-5 text-green-400" />
+                    </div>
+                    Pull Requests
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <PullRequestsView />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
 
