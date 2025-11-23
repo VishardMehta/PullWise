@@ -363,8 +363,8 @@ export function PullRequestsView() {
               {selectedPR?.id === pr.id && (
                 <div className="mt-4">
                   <Separator className="my-4 bg-white/10" />
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                    <div className="max-h-[800px] overflow-y-auto">
                       <div className="text-sm text-white/60 mb-2">Static analysis</div>
                       <CodeAnalysisView
                         pullRequestId={pr.id.toString()}
@@ -373,7 +373,7 @@ export function PullRequestsView() {
                       />
                     </div>
 
-                    <div>
+                    <div className="max-h-[800px] overflow-y-auto">
                       <div className="text-sm text-white/60 mb-2">ML analysis</div>
                       <MLAnalysisView
                         analysis={mlAnalysis}
