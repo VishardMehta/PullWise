@@ -188,11 +188,42 @@ export class CodeAnalysisService {
   private checkSecurityIssues(lines: string[], filePath: string): CodeIssue[] {
     const issues: CodeIssue[] = [];
     const securityPatterns = {
-      'Hardcoded Secrets': /(['"])(password|secret|key|token|api[_-]?key)\1\s*[:=]\s*['"][^'"]+['"]/i,
-      'SQL Injection': /execute\s*\(\s*['"`].*?\$\{.*?\}/i,
-      'XSS Vulnerability': /dangerouslySetInnerHTML|innerHTML\s*=/i,
-      'Insecure Protocol': /http:\/\//i,
-      'Eval Usage': /eval\(|new Function\(/i
+      // Critical: Secrets & Credentials
+      'Hardcoded Secrets': /(['"])(password|secret|key|token|api[_-]?key|private[_-]?key|access[_-]?key|auth[_-]?token)\1\s*[:=]\s*['"][^'"]+['"]/i,
+      'Exposed Credentials': /(?:password|pwd|passwd)\s*[:=]\s*['"][^'"]{0,50}['"]/i,
+      'AWS Key Exposure': /AKIA[0-9A-Z]{16}/,
+      'Private Key Hardcoded': /-----BEGIN (?:RSA |DSA )?PRIVATE KEY-----/,
+      
+      // Critical: Injection Attacks
+      'SQL Injection': /(?:execute|query|sql)\s*\(\s*[`'"].*?\$\{.*?\}|\.concat\(|\.append\(/i,
+      'Command Injection': /(?:exec|spawn|fork|system)\s*\(\s*['"`].*?\$\{|\.concat\(/i,
+      'NoSQL Injection': /(?:find|findOne|update|delete|remove)\s*\(\s*\{.*?\$\{/i,
+      
+      // High: XSS & DOM Vulnerabilities
+      'XSS Vulnerability': /dangerouslySetInnerHTML|innerHTML\s*=|document\.write|eval\(|Function\(/i,
+      'Unsafe String Interpolation': /innerHTML\s*\+=|insertAdjacentHTML/i,
+      'Unsafe DOM Methods': /\.html\(|\.append\(|jQuery.*html/i,
+      
+      // High: Insecure Communication
+      'Insecure Protocol': /http:\/\/(?!localhost)/i,
+      'Insecure Cookie': /secure\s*[:=]\s*false|httpOnly\s*[:=]\s*false/i,
+      
+      // High: Cryptography Issues
+      'Weak Crypto': /md5|sha1|DES|RC4|crypt\(/i,
+      'Hardcoded Cipher Key': /cipher\.update\(.*['"][a-zA-Z0-9]{8,}/i,
+      
+      // Medium: Authentication & Authorization
+      'Weak Password Check': /password.*length\s*[<]{1,2}\s*[68]/i,
+      'JWT without Verification': /jwt\.decode\s*\([^,]*\)(?!\s*,\s*verify)/i,
+      'Missing CSRF Token': /form.*method\s*=\s*['"](post|put|delete)/i,
+      
+      // Medium: Race Conditions & Concurrency
+      'Potential Race Condition': /setTimeout|setInterval.*(?:fetch|axios|supabase)/i,
+      'TOCTOU Vulnerability': /(?:fs\.exists|fs\.stat).*fs\.(?:write|read)/i,
+      
+      // Medium: Logic Issues
+      'Always True Condition': /if\s*\(\s*true\s*\)|if\s*\(\s*1\s*\)/i,
+      'Dead Code': /else\s*{\s*(?:\/\/|throw|return|unreachable)/i
     };
 
     lines.forEach((line, index) => {
@@ -218,13 +249,103 @@ export class CodeAnalysisService {
 
   private getSecuritySuggestion(issue: string): string {
     const suggestions: Record<string, string> = {
-      'Hardcoded Secrets': 'Move sensitive data to environment variables or secure vault',
-      'SQL Injection': 'Use parameterized queries or an ORM',
-      'XSS Vulnerability': 'Use safe content rendering methods or DOMPurify',
-      'Insecure Protocol': 'Use HTTPS instead of HTTP',
-      'Eval Usage': 'Avoid using eval() or new Function(). Use safer alternatives'
+      'Hardcoded Secrets': 'Move sensitive data to environment variables, use dotenv, or integrate with a secrets management service',
+      'Exposed Credentials': 'Never hardcode credentials. Use environment variables or a vault service (AWS Secrets Manager, HashiCorp Vault)',
+      'AWS Key Exposure': 'This looks like an AWS access key. Immediately rotate it. Use IAM roles instead of keys',
+      'Private Key Hardcoded': 'Critical: Private keys must never be in code. Use key management services',
+      'SQL Injection': 'Use parameterized queries or an ORM (Prisma, TypeORM, Sequelize) to prevent SQL injection',
+      'Command Injection': 'Use execFile() with array arguments or shell escaping libraries. Avoid string concatenation',
+      'NoSQL Injection': 'Validate and sanitize input. Use schema validation libraries like Joi or Zod',
+      'XSS Vulnerability': 'Use React\'s built-in escaping or DOMPurify. Avoid dangerouslySetInnerHTML',
+      'Unsafe String Interpolation': 'Use textContent instead of innerHTML. Sanitize user input with DOMPurify',
+      'Unsafe DOM Methods': 'Use React or Vue instead of direct DOM manipulation. Use appendChild() for safe element insertion',
+      'Insecure Protocol': 'Always use HTTPS in production. Configure HSTS headers',
+      'Insecure Cookie': 'Set Secure, HttpOnly, and SameSite flags on all cookies',
+      'Weak Crypto': 'Use strong algorithms: SHA-256+ for hashing, AES-256 for encryption, RSA-2048+ for key exchange',
+      'Hardcoded Cipher Key': 'Store encryption keys in a secure vault. Use a key derivation function (PBKDF2, Argon2)',
+      'Weak Password Check': 'Enforce minimum 12-character passwords. Use bcrypt, scrypt, or Argon2 for hashing',
+      'JWT without Verification': 'Always verify JWT signatures with the correct key and algorithm',
+      'Missing CSRF Token': 'Implement CSRF protection using tokens or SameSite cookies',
+      'Potential Race Condition': 'Use proper synchronization: locks, mutexes, or avoid shared state. Consider async/await patterns',
+      'TOCTOU Vulnerability': 'Check and use files atomically. Handle filesystem errors carefully',
+      'Always True Condition': 'This conditional logic is unreachable. Remove or fix the condition',
+      'Dead Code': 'Remove unreachable code paths'
     };
-    return suggestions[issue] || 'Review and fix the security issue';
+    return suggestions[issue] || 'Review and fix the security issue immediately';
+  }
+
+  // Calculate cyclomatic complexity of code
+  private calculateCyclomaticComplexity(lines: string[]): { complexity: number; level: 'low' | 'medium' | 'high' | 'critical' } {
+    let complexity = 1; // Base complexity
+    
+    lines.forEach((line) => {
+      if (!line.startsWith('+')) return;
+      const codeLine = line.substring(1);
+      
+      // Count decision points
+      // if, else if, else, ? :, switch, case, for, while, do, catch
+      const ifMatches = (codeLine.match(/\bif\s*\(/g) || []).length;
+      const elseIfMatches = (codeLine.match(/\belse\s+if\s*\(/g) || []).length;
+      const switchMatches = (codeLine.match(/\bswitch\s*\(/g) || []).length;
+      const caseMatches = (codeLine.match(/\bcase\s+/g) || []).length;
+      const forMatches = (codeLine.match(/\bfor\s*\(/g) || []).length;
+      const whileMatches = (codeLine.match(/\bwhile\s*\(/g) || []).length;
+      const doMatches = (codeLine.match(/\bdo\s*{/g) || []).length;
+      const catchMatches = (codeLine.match(/\bcatch\s*\(/g) || []).length;
+      const ternaryMatches = (codeLine.match(/\?[^:]*:/g) || []).length;
+      const logicalAnd = (codeLine.match(/&&/g) || []).length;
+      const logicalOr = (codeLine.match(/\|\|/g) || []).length;
+
+      complexity += ifMatches + elseIfMatches + switchMatches + caseMatches + 
+                   forMatches + whileMatches + doMatches + catchMatches + 
+                   ternaryMatches + logicalAnd + logicalOr;
+    });
+
+    // Determine complexity level
+    let level: 'low' | 'medium' | 'high' | 'critical';
+    if (complexity <= 3) level = 'low';
+    else if (complexity <= 7) level = 'medium';
+    else if (complexity <= 15) level = 'high';
+    else level = 'critical';
+
+    return { complexity, level };
+  }
+
+  // Detect code duplication within changed code
+  private detectCodeDuplication(lines: string[]): CodeIssue[] {
+    const issues: CodeIssue[] = [];
+    const codeBlocks: Map<string, number[]> = new Map();
+    
+    // Extract added lines
+    const addedLines = lines
+      .map((line, index) => ({ content: line.substring(1).trim(), index }))
+      .filter(l => l.content && lines[l.index].startsWith('+'));
+    
+    // Look for duplicate blocks (5+ lines)
+    for (let i = 0; i < addedLines.length - 5; i++) {
+      const block = addedLines.slice(i, i + 5).map(l => l.content).join('\n');
+      
+      // Simple hashing for duplicate detection
+      const blockHash = Buffer.from(block).toString('base64').slice(0, 20);
+      
+      if (codeBlocks.has(blockHash)) {
+        const previousIndex = codeBlocks.get(blockHash)![0];
+        if (i - previousIndex > 5) { // Only flag if not adjacent
+          issues.push({
+            type: 'suggestion',
+            message: 'Potential code duplication detected',
+            line: addedLines[i].index + 1,
+            file: 'multiple locations',
+            suggestion: 'Consider extracting this code into a reusable function or utility',
+            severity: 'medium'
+          });
+        }
+      } else {
+        codeBlocks.set(blockHash, [i]);
+      }
+    }
+    
+    return issues;
   }
 
   private analyzePerformance(lines: string[], filePath: string): CodeIssue[] {
@@ -234,23 +355,63 @@ export class CodeAnalysisService {
     const patterns = [
       {
         pattern: /useEffect\(\(\)\s*=>\s*{[^}]*},\s*\[\s*\]\)/,
-        message: 'Empty dependency array in useEffect',
-        suggestion: 'Add required dependencies or justify the empty array in comments'
+        message: 'Empty dependency array in useEffect - infinite loop risk',
+        suggestion: 'Add required dependencies or add a comment explaining why it\'s empty'
       },
       {
         pattern: /\.map\(.*\.map\(/,
-        message: 'Nested array operations detected',
-        suggestion: 'Consider using a single loop or optimizing data structure'
+        message: 'Nested array operations detected - O(n²) complexity',
+        suggestion: 'Use flatMap, single loop, or optimize data structure for better performance'
       },
       {
         pattern: /new\s+Promise/,
-        message: 'Manual Promise creation',
-        suggestion: 'Use async/await or existing Promise-based APIs when possible'
+        message: 'Manual Promise creation - consider async/await',
+        suggestion: 'Use async/await or existing Promise-based APIs for cleaner code'
       },
       {
         pattern: /setInterval|setTimeout/,
         message: 'Timer usage detected',
-        suggestion: 'Ensure proper cleanup in component unmount'
+        suggestion: 'Ensure proper cleanup in component unmount to prevent memory leaks'
+      },
+      {
+        pattern: /useEffect[^}]*\[.*,/,
+        message: 'useEffect with inline objects/arrays in dependencies',
+        suggestion: 'Move objects/arrays outside useEffect or use useMemo to prevent unnecessary re-renders'
+      },
+      {
+        pattern: /\.filter\(.*\)\.map\(|\.map\(.*\)\.filter\(/,
+        message: 'Multiple array iterations detected',
+        suggestion: 'Combine filter and map into one iteration for better performance'
+      },
+      {
+        pattern: /onClick.*=>.*setState|onChange.*=>.*setState/,
+        message: 'Direct state mutation in event handler',
+        suggestion: 'Ensure state updates are properly batched and optimized'
+      },
+      {
+        pattern: /JSON\.stringify.*JSON\.parse/,
+        message: 'JSON stringify/parse cycle detected',
+        suggestion: 'This is inefficient. Consider using structural cloning or other methods'
+      },
+      {
+        pattern: /for\s*\([^)]*\{[^}]*for\s*\(/,
+        message: 'Nested loops detected - potential O(n²) complexity',
+        suggestion: 'Consider refactoring to use maps, sets, or a better data structure'
+      },
+      {
+        pattern: /function.*\{.*function.*\{[^}]*function/,
+        message: 'Deeply nested functions detected',
+        suggestion: 'Extract nested functions or refactor for better readability and performance'
+      },
+      {
+        pattern: /const.*=.*\[.*\].*\.filter.*\.map/,
+        message: 'Creating large intermediate arrays',
+        suggestion: 'Use generators or streaming approaches to reduce memory usage'
+      },
+      {
+        pattern: /import.*\n.*import.*\n.*import.*\n.*import.*\n.*import/,
+        message: 'Many imports detected - potential bundle size issue',
+        suggestion: 'Consider code splitting or lazy loading for unused imports'
       }
     ];
 
@@ -449,6 +610,22 @@ export class CodeAnalysisService {
     issues.push(...this.analyzeDiff(lines, file.path));
     issues.push(...this.checkSecurityIssues(lines, file.path));
     issues.push(...this.analyzePerformance(lines, file.path));
+    
+    // NEW: Check cyclomatic complexity
+    const { complexity, level } = this.calculateCyclomaticComplexity(lines);
+    if (level === 'high' || level === 'critical') {
+      issues.push({
+        type: level === 'critical' ? 'error' : 'warning',
+        message: `High cyclomatic complexity detected (${complexity})`,
+        line: 1,
+        file: file.path,
+        suggestion: 'Break down complex logic into smaller functions for better maintainability and testability',
+        severity: level === 'critical' ? 'high' : 'medium'
+      });
+    }
+    
+    // NEW: Check for code duplication
+    issues.push(...this.detectCodeDuplication(lines));
 
     return issues;
   }
