@@ -307,7 +307,7 @@ export function PullRequestsView() {
           {pullRequests.map((pr) => (
             <div
               key={pr.id}
-              className="p-5 bg-gradient-to-br from-black/60 to-black/40 rounded-xl border border-white/20 hover:border-white/30 hover:from-black/70 hover:to-black/50 backdrop-blur-md transition-all duration-200"
+              className="p-5 bg-white/10 border-white/20 backdrop-blur-sm rounded-xl hover:bg-white/[0.15] hover:border-white/30 transition-all duration-200"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
