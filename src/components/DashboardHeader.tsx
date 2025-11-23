@@ -26,31 +26,15 @@ export function DashboardHeader({ profile, currentPage, onSignOut }: DashboardHe
 
           {/* Right: Navigation & Actions */}
           <div className="flex items-center gap-3">
-            {/* Navigation Buttons */}
+            {/* Toggle Navigation Button */}
             <Button
-              onClick={() => navigate('/dashboard')}
-              variant={currentPage === 'dashboard' ? 'default' : 'ghost'}
+              onClick={() => navigate(currentPage === 'dashboard' ? '/profile' : '/dashboard')}
+              variant="ghost"
               size="sm"
-              className={currentPage === 'dashboard' 
-                ? 'bg-purple-500/20 text-purple-400 hover:bg-purple-500/30' 
-                : 'text-white/70 hover:text-white hover:bg-white/10'
-              }
+              className="text-white/70 hover:text-white hover:bg-white/10"
             >
               <LayoutDashboard className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-
-            <Button
-              onClick={() => navigate('/profile')}
-              variant={currentPage === 'profile' ? 'default' : 'ghost'}
-              size="sm"
-              className={currentPage === 'profile' 
-                ? 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30' 
-                : 'text-white/70 hover:text-white hover:bg-white/10'
-              }
-            >
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Profile
+              {currentPage === 'dashboard' ? 'Profile' : 'Dashboard'}
             </Button>
 
             {/* Sign Out Button */}
