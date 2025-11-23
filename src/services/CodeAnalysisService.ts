@@ -325,8 +325,8 @@ export class CodeAnalysisService {
     for (let i = 0; i < addedLines.length - 5; i++) {
       const block = addedLines.slice(i, i + 5).map(l => l.content).join('\n');
       
-      // Simple hashing for duplicate detection
-      const blockHash = Buffer.from(block).toString('base64').slice(0, 20);
+      // Simple hashing for duplicate detection (browser-compatible)
+      const blockHash = btoa(block).slice(0, 20);
       
       if (codeBlocks.has(blockHash)) {
         const previousIndex = codeBlocks.get(blockHash)![0];
