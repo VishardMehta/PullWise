@@ -84,34 +84,104 @@ export class MLAnalysisService {
 
     const exampleJson = JSON.stringify(
       {
-        summary: 'Short summary of the PR in one or two sentences.',
-        classification: { label: 'bug', confidence: 0.95 },
+        summary: 'This PR introduces authentication middleware for the API endpoints and adds rate limiting to prevent abuse. The changes improve security posture significantly by implementing JWT validation and request throttling. However, there are some concerns around error handling consistency and the lack of unit tests for the new middleware components.',
+        classification: { label: 'security', confidence: 0.92 },
         suggestedPatches: [
           {
-            path: 'src/example.js',
-            summary: 'Fix null check',
-            patch: '--- a/src/example.js\n+++ b/src/example.js\n@@ -10,6 +10,8 @@\n-  if (x) doThing();\n+  if (x != null) doThing();\n'
+            path: 'src/middleware/auth.js',
+            summary: 'Add comprehensive error handling for JWT validation to prevent information leakage and improve debugging. Current implementation exposes internal error details.',
+            patch: '--- a/src/middleware/auth.js\n+++ b/src/middleware/auth.js\n@@ -15,7 +15,12 @@\n   try {\n     const decoded = jwt.verify(token, SECRET);\n     req.user = decoded;\n-  } catch (err) {\n-    return res.status(401).json({ error: err.message });\n+  } catch (err) {\n+    console.error(\'JWT verification failed:\', err);\n+    if (err.name === \'TokenExpiredError\') {\n+      return res.status(401).json({ error: \'Token expired\' });\n+    }\n+    return res.status(401).json({ error: \'Invalid token\' });\n   }\n'
           }
         ],
         explanation: {
-          failingCode: 'const x = obj.prop;',
-          rootCause: 'obj can be null; missing guard',
-          minimalPatch: "add null check for obj before accessing prop",
-          estimatedEffort: '10-20 minutes',
-          impactScore: 30
+          failingCode: 'catch (err) { return res.status(401).json({ error: err.message }); }',
+          rootCause: 'The error handler directly exposes internal JWT library error messages to clients, which can leak implementation details and aid attackers. Different JWT errors (expired, malformed, invalid signature) should be normalized to prevent enumeration attacks.',
+          minimalPatch: "Replace generic error.message exposure with specific, sanitized error messages based on error type. Log detailed errors server-side while returning safe messages to clients.",
+          estimatedEffort: '30-45 minutes including testing',
+          impactScore: 45
         },
-        impact: { score: 30, reason: 'Potential null pointer crash in login flow' },
-        recommendations: ['Add guard for obj', 'Add unit test for missing username'],
-        risks: [{ level: 'medium', description: 'May change behavior when obj is undefined', mitigation: 'Add tests' }],
-        bestPractices: { followed: ['uses named functions'], violations: ['missing guard on input'] },
-        codeQuality: { score: 60, feedback: ['Consider smaller functions', 'Add tests for edge cases'] }
+        impact: { 
+          score: 75, 
+          reason: 'This PR significantly improves the security posture of the application by adding authentication and rate limiting, reducing the risk of unauthorized access and DoS attacks. The impact is substantial as it protects all API endpoints. However, the incomplete error handling could leak sensitive implementation details to attackers, which partially reduces the security benefit.' 
+        },
+        recommendations: [
+          'Implement comprehensive unit tests for the authentication middleware, covering valid tokens, expired tokens, malformed tokens, and missing tokens scenarios',
+          'Add integration tests to verify the rate limiting behavior under various load conditions',
+          'Sanitize all error messages returned to clients to prevent information disclosure - never expose internal error details',
+          'Consider implementing a centralized error handling middleware to ensure consistent error responses across all endpoints',
+          'Add monitoring and alerting for authentication failures and rate limit violations to detect potential attacks',
+          'Document the authentication flow and rate limiting configuration in the API documentation',
+          'Implement token refresh mechanism to improve user experience when tokens expire',
+          'Add request logging with correlation IDs for better debugging and security auditing',
+          'Consider implementing different rate limits for authenticated vs unauthenticated requests',
+          'Add health check endpoint that bypasses authentication for monitoring purposes'
+        ],
+        risks: [
+          { 
+            level: 'high', 
+            description: 'Error messages expose internal JWT implementation details (error.message), potentially revealing the JWT library version and configuration. Attackers could use this information to craft targeted attacks or identify known vulnerabilities in the JWT library.',
+            mitigation: 'Implement error sanitization layer that maps internal errors to generic, safe messages. Log detailed errors server-side with correlation IDs for debugging. Use static error messages for all authentication failures.'
+          },
+          {
+            level: 'medium',
+            description: 'Rate limiting configuration uses hardcoded values without environment-specific tuning. Production traffic patterns may differ significantly from development, potentially causing legitimate users to be rate-limited or allowing attacks to succeed.',
+            mitigation: 'Move rate limit configuration to environment variables or configuration files. Implement different limits for different environments (dev/staging/prod). Add metrics to monitor rate limit hit rates and adjust thresholds based on actual usage patterns.'
+          },
+          {
+            level: 'medium',
+            description: 'No tests exist for the new middleware, increasing the risk of regression bugs and making refactoring more difficult. Authentication bugs can have severe security implications.',
+            mitigation: 'Add comprehensive test suite covering happy paths, edge cases, and error scenarios. Include tests for token expiration, invalid signatures, missing tokens, and rate limit boundary conditions. Aim for >90% code coverage on security-critical code.'
+          },
+          {
+            level: 'low',
+            description: 'Rate limiting uses in-memory storage which will be reset on server restart and won\'t work correctly in multi-instance deployments, potentially allowing rate limit bypass.',
+            mitigation: 'Consider using Redis or another distributed cache for rate limiting state in production. Document the current limitation and create a follow-up ticket for implementing distributed rate limiting.'
+          }
+        ],
+        bestPractices: { 
+          followed: [
+            'Uses industry-standard JWT for authentication instead of custom token implementation',
+            'Implements rate limiting to prevent abuse and DoS attacks',
+            'Validates JWT signatures to ensure token integrity',
+            'Uses environment variables for sensitive configuration (JWT secret)',
+            'Implements middleware pattern for cross-cutting concerns',
+            'Follows Express.js middleware conventions and patterns',
+            'Uses async/await for asynchronous operations',
+            'Includes appropriate HTTP status codes (401 for unauthorized)'
+          ], 
+          violations: [
+            'Exposes internal error messages to clients (violation of secure error handling principle) - see auth.js line 23',
+            'Missing input validation for token format before JWT verification',
+            'No unit tests for security-critical authentication logic (violates testing best practices)',
+            'Hardcoded configuration values instead of using environment-specific configs',
+            'Missing JSDoc documentation for public middleware functions',
+            'No request correlation IDs for debugging and audit logging'
+          ] 
+        },
+        codeQuality: { 
+          score: 68, 
+          feedback: [
+            'Error handling is inconsistent - some endpoints return error objects while others return error strings. Standardize on a single error response format across all endpoints.',
+            'Authentication middleware lacks comprehensive input validation. Add explicit checks for Authorization header presence and Bearer token format before attempting JWT verification.',
+            'Consider extracting JWT verification logic into a separate utility function for better testability and reusability.',
+            'Rate limiting middleware mixes configuration and implementation. Extract configuration to a separate file for better maintainability.',
+            'Missing JSDoc comments for exported middleware functions. Add documentation describing parameters, return values, and error conditions.',
+            'Authentication middleware has too many responsibilities. Consider splitting into separate middlewares for token extraction, validation, and user loading.',
+            'No logging of authentication events. Add structured logging for successful authentications and failures for security monitoring.',
+            'Magic numbers in rate limiting configuration (e.g., 100 requests per minute). Define these as named constants with descriptive names.',
+            'Consider adding TypeScript or JSDoc type annotations to improve code documentation and catch type-related errors early.',
+            'Test coverage is currently 0%. Add unit tests with minimum 80% coverage target for new middleware functions.'
+          ] 
+        }
       },
       null,
       2
     );
 
     return `
-SYSTEM: You are an expert senior software engineer and code reviewer. Produce exactly ONE valid JSON object matching the schema below and nothing else — no explanation, no Markdown, no surrounding text. If you cannot produce valid JSON for any reason, return a single JSON object: {"error":"<short reason>"}.
+SYSTEM: You are a highly experienced senior software engineer and code reviewer with expertise in software architecture, security, performance optimization, and best practices. Your task is to provide a COMPREHENSIVE and DETAILED code review.
+
+Produce exactly ONE valid JSON object matching the schema below. Provide in-depth analysis with specific examples and actionable insights. Be thorough but precise.
 
 CONTEXT:
 - PR Title: ${request.title}
@@ -121,40 +191,92 @@ CONTEXT:
 - Total Deletions: ${totalDeletions}
 - Commit Count: ${request.commits.length}
 
-CONSTRAINTS:
-- Output must be valid JSON and must match the schema exactly (fields may be null or empty arrays if unknown).
-- Use deterministic output. Prefer factual, conservative answers over speculation.
-- Use small unified-diff style patches for suggestedPatches.patch.
-- If a field cannot be determined, return null or an empty array. Do not invent data.
-- Rate confidence scores on actual code evidence (0.0-1.0 scale)
-- Impact score: 0-100 where 100 is critical production issue
-- Code quality score: 0-100 where 100 is excellent code
-- If changes are large, produce best-effort analysis and note in recommendations
+CRITICAL INSTRUCTIONS:
+- Provide DETAILED analysis - aim for comprehensive feedback, not brief summaries
+- Each recommendation should be specific with clear reasoning and examples
+- For risks, provide detailed descriptions and concrete mitigation strategies
+- Code quality feedback should include specific code patterns observed and improvements
+- Summary should be 3-5 sentences capturing key insights
+- Provide at least 5-8 actionable recommendations ranked by priority
+- Include specific code snippets in explanations when referencing issues
+- Be thorough in best practices analysis - cite specific patterns
 
-ANALYSIS FOCUS AREAS:
-1. Security: potential vulnerabilities, authentication, data handling
-2. Performance: inefficient patterns, bottlenecks, scalability issues
-3. Maintainability: code readability, complexity, testability
-4. Best Practices: SOLID principles, design patterns, error handling
-5. Testing: coverage, edge cases, test quality
+OUTPUT REQUIREMENTS:
+- Valid JSON matching the schema exactly
+- Detailed, specific feedback (not generic advice)
+- Evidence-based scores with clear reasoning
+- Unified-diff format for patches
+- Conservative confidence scores (0.0-1.0) based on actual evidence
+- Impact scores: 0-100 (100 = critical production issue)
+- Code quality scores: 0-100 (100 = excellent, production-ready code)
+
+ANALYSIS FRAMEWORK - Examine Each Area Thoroughly:
+
+1. SECURITY ANALYSIS:
+   - Authentication & Authorization vulnerabilities
+   - Input validation and sanitization issues
+   - Injection vulnerabilities (SQL, XSS, etc.)
+   - Sensitive data exposure
+   - Cryptographic weaknesses
+   - Dependency vulnerabilities
+
+2. PERFORMANCE REVIEW:
+   - Algorithm complexity (O(n) analysis)
+   - Database query optimization
+   - Memory leaks and resource management
+   - Network call efficiency
+   - Caching opportunities
+   - Scalability concerns
+
+3. CODE QUALITY ASSESSMENT:
+   - Code complexity and readability
+   - Naming conventions and clarity
+   - Function/method size and responsibility
+   - Code duplication (DRY principle)
+   - Comments and documentation quality
+   - Error handling completeness
+
+4. ARCHITECTURE & DESIGN:
+   - SOLID principles adherence
+   - Design patterns usage
+   - Separation of concerns
+   - Modularity and reusability
+   - API design quality
+   - State management
+
+5. TESTING & RELIABILITY:
+   - Test coverage completeness
+   - Edge case handling
+   - Error scenarios coverage
+   - Unit vs integration test balance
+   - Mock usage appropriateness
+   - Test quality and maintainability
+
+6. MAINTAINABILITY:
+   - Code organization structure
+   - Dependency management
+   - Configuration handling
+   - Logging and observability
+   - Technical debt introduction
+   - Future extensibility
 
 SCHEMA:
 {
-  "summary": string (2-3 sentence overview),
+  "summary": string (3-5 comprehensive sentences covering key changes, main improvements, and primary concerns),
   "classification": { "label": string (bug|feature|refactor|security|performance|test|docs), "confidence": number (0.0-1.0) },
-  "suggestedPatches": [ { "path": string, "summary": string, "patch": string (unified diff) } ],
+  "suggestedPatches": [ { "path": string, "summary": string (detailed explanation), "patch": string (unified diff) } ],
   "explanation": {
-    "failingCode": string (minimal code snippet),
-    "rootCause": string (why the issue exists),
-    "minimalPatch": string (brief fix description),
-    "estimatedEffort": string (time to fix),
+    "failingCode": string (specific code snippet with context),
+    "rootCause": string (detailed explanation of why the issue exists, including context),
+    "minimalPatch": string (comprehensive fix description with reasoning),
+    "estimatedEffort": string (realistic time estimate),
     "impactScore": number (0-100, higher = more critical)
   },
-  "impact": { "score": number (0-100), "reason": string },
-  "recommendations": [string] (ordered by priority),
-  "risks": [ { "level": "low" | "medium" | "high", "description": string, "mitigation": string } ],
-  "bestPractices": { "followed": [string], "violations": [string] },
-  "codeQuality": { "score": number (0-100), "feedback": [string] }
+  "impact": { "score": number (0-100), "reason": string (detailed explanation of business and technical impact) },
+  "recommendations": [string] (8-12 specific, actionable recommendations with clear reasoning, ordered by priority),
+  "risks": [ { "level": "low" | "medium" | "high", "description": string (detailed risk description with examples), "mitigation": string (specific, actionable mitigation strategy) } ] (identify 3-6 risks),
+  "bestPractices": { "followed": [string] (5-8 specific practices with examples), "violations": [string] (3-6 specific violations with code references) },
+  "codeQuality": { "score": number (0-100), "feedback": [string] (6-10 detailed, specific feedback items with examples and suggestions) }
 }
 
 EXAMPLE OUTPUT:
