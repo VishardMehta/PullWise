@@ -70,6 +70,83 @@ export type Database = {
         }
         Relationships: []
       },
+      pr_analysis_history: {
+        Row: {
+          id: string
+          user_id: string
+          repository_owner: string
+          repository_name: string
+          pr_number: number
+          pr_title: string | null
+          pr_author: string | null
+          pr_state: string | null
+          pr_url: string | null
+          code_quality_score: number | null
+          ml_impact_score: number | null
+          risk_level: string | null
+          code_analysis_result: Json | null
+          ml_analysis_result: Json | null
+          analysis_duration_ms: number | null
+          files_changed: number | null
+          additions: number | null
+          deletions: number | null
+          analyzed_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          repository_owner: string
+          repository_name: string
+          pr_number: number
+          pr_title?: string | null
+          pr_author?: string | null
+          pr_state?: string | null
+          pr_url?: string | null
+          code_quality_score?: number | null
+          ml_impact_score?: number | null
+          risk_level?: string | null
+          code_analysis_result?: Json | null
+          ml_analysis_result?: Json | null
+          analysis_duration_ms?: number | null
+          files_changed?: number | null
+          additions?: number | null
+          deletions?: number | null
+          analyzed_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          repository_owner?: string
+          repository_name?: string
+          pr_number?: number
+          pr_title?: string | null
+          pr_author?: string | null
+          pr_state?: string | null
+          pr_url?: string | null
+          code_quality_score?: number | null
+          ml_impact_score?: number | null
+          risk_level?: string | null
+          code_analysis_result?: Json | null
+          ml_analysis_result?: Json | null
+          analysis_duration_ms?: number | null
+          files_changed?: number | null
+          additions?: number | null
+          deletions?: number | null
+          analyzed_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pr_analysis_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      },
       user_profiles: {
         Row: {
           avatar_url: string | null

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { PullRequestsView } from '@/components/PullRequestsView';
+import { TrendsView } from '@/components/Trends/TrendsView';
 import { DottedSurface } from '@/components/DottedSurface';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { Footer } from '@/components/Footer';
@@ -435,6 +436,13 @@ const Dashboard = () => {
                 <GitBranch className="h-4 w-4 mr-2" />
                 Pull Requests
               </TabsTrigger>
+              <TabsTrigger 
+                value="trends" 
+                className="data-[state=active]:bg-pink-500/20 data-[state=active]:text-pink-400 transition-colors"
+              >
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Trends
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="languages">
@@ -656,6 +664,10 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+
+            <TabsContent value="trends">
+              <TrendsView />
             </TabsContent>
           </Tabs>
 

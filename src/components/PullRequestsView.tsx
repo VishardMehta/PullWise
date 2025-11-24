@@ -3,12 +3,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code } from 'lucide-react';
+import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code, Eye, EyeOff } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { CodeAnalysisView } from '@/components/CodeAnalysis/CodeAnalysisView';
 import { MLAnalysisView } from '@/components/MLAnalysis/MLAnalysisView';
+import { DiffViewer } from '@/components/DiffViewer/DiffViewer';
 import { CodeAnalysisService } from '@/services/CodeAnalysisService';
 import { MLAnalysisService } from '@/services/MLAnalysisService';
+import { AnalysisHistoryService } from '@/services/AnalysisHistoryService';
 
 interface PullRequest {
   id: number;
@@ -53,6 +55,7 @@ export function PullRequestsView() {
   const [selectedPR, setSelectedPR] = useState<PullRequest | null>(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [showDiff, setShowDiff] = useState(false);
 
   const fetchPullRequests = async () => {
     if (!repoUrl) {
@@ -249,6 +252,23 @@ export function PullRequestsView() {
       console.log('Analysis Results:', { codeResult, mlResult });
       setAnalysisResult(codeResult);
       setMlAnalysis(mlResult);
+
+      // Save analysis to history for trends
+      const historyService = AnalysisHistoryService.getInstance();
+      await historyService.saveAnalysis({
+        repositoryOwner: owner,
+        repositoryName: repo,
+        prNumber: pr.number,
+        prTitle: pr.title,
+        prAuthor: pr.user.login,
+        prState: pr.state,
+        prUrl: pr.html_url,
+        filesChanged: processedFiles.length,
+        additions: processedFiles.reduce((sum, f) => sum + (f.additions || 0), 0),
+        deletions: processedFiles.reduce((sum, f) => sum + (f.deletions || 0), 0),
+        codeAnalysisResult: codeResult,
+        mlAnalysisResult: mlResult,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to analyze pull request');
       setAnalysisResult(null);
@@ -362,21 +382,50 @@ export function PullRequestsView() {
                 </div>
 
                 {/* Analyze Button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500/50 shrink-0"
-                  onClick={() => analyzePullRequest(pr)}
-                >
-                  <Code className="h-4 w-4 mr-1.5" />
-                  Analyze
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500/50 shrink-0"
+                    onClick={() => analyzePullRequest(pr)}
+                  >
+                    <Code className="h-4 w-4 mr-1.5" />
+                    Analyze
+                  </Button>
+                  {selectedPR?.id === pr.id && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50 shrink-0"
+                      onClick={() => setShowDiff(!showDiff)}
+                    >
+                      {showDiff ? <EyeOff className="h-4 w-4 mr-1.5" /> : <Eye className="h-4 w-4 mr-1.5" />}
+                      {showDiff ? 'Hide Diff' : 'View Diff'}
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {/* If this PR is selected, show the analyses directly below this PR */}
               {selectedPR?.id === pr.id && (
                 <div className="mt-6">
                   <Separator className="my-4 bg-white/10" />
+                  
+                  {/* Diff Viewer */}
+                  {showDiff && (
+                    <>
+                      <div className="mb-6">
+                        <div className="text-sm text-white/60 mb-3">Code Changes</div>
+                        <DiffViewer
+                          owner={pr.base.repo.full_name.split('/')[0]}
+                          repo={pr.base.repo.full_name.split('/')[1]}
+                          pullNumber={pr.number}
+                        />
+                      </div>
+                      <Separator className="my-4 bg-white/10" />
+                    </>
+                  )}
+
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
                     <div className="max-h-[800px] overflow-y-auto pr-2 scrollbar-thin">
                       <div className="text-sm text-white/60 mb-2">Static analysis</div>
