@@ -5,7 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
-  Flask, 
+  TestTube, 
   Loader2, 
   ExternalLink, 
   Trash2, 
@@ -108,7 +108,7 @@ export function SandboxView() {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight text-white flex items-center gap-2">
-            <Flask className="h-6 w-6 text-purple-400" />
+            <TestTube className="h-6 w-6 text-purple-400" />
             Testing Sandbox
           </h2>
           <p className="text-sm text-white/60">
@@ -127,7 +127,7 @@ export function SandboxView() {
             </>
           ) : (
             <>
-              <Flask className="mr-2 h-4 w-4" />
+              <TestTube className="mr-2 h-4 w-4" />
               Create New Sandbox
             </>
           )}
@@ -154,25 +154,25 @@ export function SandboxView() {
       ) : sandboxRepos.length === 0 ? (
         <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <Flask className="h-16 w-16 text-white/20 mb-4" />
+            <TestTube className="h-16 w-16 text-white/20 mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">No Sandboxes Yet</h3>
             <p className="text-white/60 mb-6 max-w-md">
               Create your first sandbox to get started with sample PRs and practice analysis
             </p>
-            <Button 
-              onClick={createSandbox} 
+            <Button
+              onClick={createSandbox}
               disabled={creating}
-              className="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30"
+              className="bg-purple-500 hover:bg-purple-600"
             >
               {creating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  Creating Sandbox...
                 </>
               ) : (
                 <>
-                  <Flask className="mr-2 h-4 w-4" />
-                  Create Sandbox
+                  <TestTube className="mr-2 h-4 w-4" />
+                  Create New Sandbox
                 </>
               )}
             </Button>

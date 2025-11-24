@@ -43,7 +43,7 @@ import {
   Users,
   UserPlus,
   HardDrive,
-  Flask,
+  TestTube,
 } from 'lucide-react';
 
 interface UserProfile {
@@ -449,7 +449,7 @@ const Dashboard = () => {
                 value="sandbox" 
                 className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400 transition-colors"
               >
-                <Flask className="h-4 w-4 mr-2" />
+                <TestTube className="h-4 w-4 mr-2" />
                 Sandbox
               </TabsTrigger>
             </TabsList>
