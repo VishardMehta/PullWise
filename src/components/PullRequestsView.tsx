@@ -395,16 +395,14 @@ export function PullRequestsView() {
     <>
       {/* Comparison View Modal */}
       {showComparison && comparisonData && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 p-4 overflow-y-auto">
-          <div className="min-h-full flex items-center justify-center">
-            <div className="w-full max-w-5xl my-8">
-              <ComparisonView
-                originalPR={comparisonData.originalPR}
-                improvedPR={comparisonData.improvedPR}
-                improvements={comparisonData.improvements}
-                onClose={() => setShowComparison(false)}
-              />
-            </div>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+            <ComparisonView
+              originalPR={comparisonData.originalPR}
+              improvedPR={comparisonData.improvedPR}
+              improvements={comparisonData.improvements}
+              onClose={() => setShowComparison(false)}
+            />
           </div>
         </div>
       )}
