@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code, Eye, EyeOff } from 'lucide-react';
+import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code, Eye, EyeOff, TestTube } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { CodeAnalysisView } from '@/components/CodeAnalysis/CodeAnalysisView';
 import { MLAnalysisView } from '@/components/MLAnalysis/MLAnalysisView';
@@ -11,6 +11,10 @@ import { DiffViewer } from '@/components/DiffViewer/DiffViewer';
 import { CodeAnalysisService } from '@/services/CodeAnalysisService';
 import { MLAnalysisService } from '@/services/MLAnalysisService';
 import { AnalysisHistoryService } from '@/services/AnalysisHistoryService';
+import { SandboxService } from '@/services/SandboxService';
+import { useToast } from '@/hooks/use-toast';
+import { SandboxService } from '@/services/SandboxService';
+import { useToast } from '@/hooks/use-toast';
 
 interface PullRequest {
   id: number;
@@ -48,6 +52,7 @@ interface PullRequest {
 
 export function PullRequestsView() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [repoUrl, setRepoUrl] = useState('');
   const [pullRequests, setPullRequests] = useState<PullRequest[]>([]);
   const [loading, setLoading] = useState(false);
@@ -56,6 +61,7 @@ export function PullRequestsView() {
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [showDiff, setShowDiff] = useState(false);
+  const [improvingInSandbox, setImprovingInSandbox] = useState(false);
 
   const fetchPullRequests = async () => {
     if (!repoUrl) {
