@@ -405,7 +405,6 @@ export function PullRequestsView() {
               originalPR={comparisonData.originalPR}
               improvedPR={comparisonData.improvedPR}
               improvements={comparisonData.improvements}
-              onClose={() => setShowComparison(false)}
             />
           )}
         </DialogContent>

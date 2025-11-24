@@ -26,10 +26,9 @@ interface ComparisonViewProps {
     score: number;
   };
   improvements: string;
-  onClose?: () => void;
 }
 
-export function ComparisonView({ originalPR, improvedPR, improvements, onClose }: ComparisonViewProps) {
+export function ComparisonView({ originalPR, improvedPR, improvements }: ComparisonViewProps) {
   // Parse improvements markdown to extract changes
   const parseImprovements = () => {
     const lines = improvements.split('\n');
@@ -70,11 +69,6 @@ export function ComparisonView({ originalPR, improvedPR, improvements, onClose }
           </h2>
           <p className="text-sm text-white/60">{originalPR.title}</p>
         </div>
-        {onClose && (
-          <Button variant="outline" onClick={onClose} className="border-white/10">
-            Close
-          </Button>
-        )}
       </div>
 
       {/* Score Comparison Card */}

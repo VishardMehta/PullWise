@@ -37,7 +37,7 @@ const Auth = () => {
         provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/profile`,
-          scopes: 'read:user user:email repo read:org',
+          scopes: 'read:user user:email repo delete_repo read:org',
         },
       });
 
