@@ -365,32 +365,66 @@ export function TrendsView() {
           </CardHeader>
           <CardContent>
             {issueTypeData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={issueTypeData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {issueTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#000000dd', 
-                      border: '1px solid #ffffff20',
-                      borderRadius: '8px',
-                      color: '#fff'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Pie Chart */}
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={issueTypeData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={false}
+                      outerRadius={90}
+                      innerRadius={50}
+                      fill="#8884d8"
+                      dataKey="value"
+                      paddingAngle={3}
+                    >
+                      {issueTypeData.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={entry.color}
+                          stroke={entry.color}
+                          strokeWidth={2}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#000000dd', 
+                        border: '1px solid #ffffff20',
+                        borderRadius: '8px',
+                        color: '#fff'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+
+                {/* Legend */}
+                <div className="flex flex-col justify-center space-y-2">
+                  {issueTypeData.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center justify-between p-2 bg-black/30 border border-white/10 rounded-lg hover:bg-black/50 transition-colors backdrop-blur-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-white text-sm font-medium">{item.name}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-white/60 text-sm">{item.value}</span>
+                        <span className="text-white font-semibold text-sm">
+                          {((item.value / totalIssues) * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : (
               <div className="h-[250px] flex items-center justify-center text-white/40">
                 No issues found

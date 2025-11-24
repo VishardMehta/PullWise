@@ -446,7 +446,7 @@ const Dashboard = () => {
             </TabsList>
 
             <TabsContent value="languages">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <div className="p-2 bg-purple-500/20 rounded-lg">
@@ -498,7 +498,7 @@ const Dashboard = () => {
                         {languageData
                           .sort((a, b) => b.value - a.value)
                           .map((lang, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                          <div key={index} className="flex items-center justify-between p-2 bg-black/10 border border-white/10 rounded-lg hover:bg-black/30 transition-colors backdrop-blur-lg">
                             <div className="flex items-center gap-3">
                               <div 
                                 className="w-4 h-4 rounded-full" 
@@ -524,7 +524,7 @@ const Dashboard = () => {
             </TabsContent>
 
             <TabsContent value="top-repos">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <div className="p-2 bg-yellow-500/20 rounded-lg">
@@ -584,7 +584,7 @@ const Dashboard = () => {
             </TabsContent>
 
             <TabsContent value="size">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <div className="p-2 bg-blue-500/20 rounded-lg">
@@ -645,7 +645,7 @@ const Dashboard = () => {
             </TabsContent>
             <TabsContent value="pull-requests">
               <div className="space-y-4">
-                <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
                       <div className="p-2 bg-green-500/20 rounded-lg">
@@ -672,7 +672,7 @@ const Dashboard = () => {
           </Tabs>
 
           {/* Recent Repositories - Most Recently Committed */}
-          <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
+          <Card className="mt-6 bg-black/20 border-white/10 backdrop-blur-2xl">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-blue-400" />
@@ -690,7 +690,7 @@ const Dashboard = () => {
                   .map((repo, index) => (
                   <div
                     key={repo.id}
-                    className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all group"
+                    className="p-4 bg-black/10 rounded-lg border border-white/10 hover:bg-black/30 transition-all group backdrop-blur-lg"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
