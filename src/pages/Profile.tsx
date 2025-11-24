@@ -311,8 +311,8 @@ const Profile = () => {
                       <h3 className="text-lg font-semibold text-white mb-4">
                         Raw Profile Data
                       </h3>
-                      <div className="bg-black/30 rounded-lg p-4 overflow-x-auto">
-                        <pre className="text-xs text-white/70">
+                      <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm rounded-lg p-4 border border-white/10 overflow-x-auto max-h-96">
+                        <pre className="text-xs text-green-400 font-mono leading-relaxed">
                           {JSON.stringify(profile.raw_user_meta_data, null, 2)}
                         </pre>
                       </div>
