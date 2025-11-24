@@ -293,14 +293,6 @@ const Profile = () => {
                         {formatDate(profile.github_created_at)}
                       </span>
                     </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/70">Last Updated:</span>
-                      <span className="text-white flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(profile.github_updated_at)}
-                      </span>
-                    </div>
                   </div>
                 </div>
 
@@ -311,8 +303,8 @@ const Profile = () => {
                       <h3 className="text-lg font-semibold text-white mb-4">
                         Raw Profile Data
                       </h3>
-                      <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm rounded-lg p-4 border border-white/10 overflow-x-auto max-h-96">
-                        <pre className="text-xs text-green-400 font-mono leading-relaxed">
+                      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 border border-white/10 overflow-x-auto max-h-96">
+                        <pre className="text-xs text-white/80 font-mono leading-6">
                           {JSON.stringify(profile.raw_user_meta_data, null, 2)}
                         </pre>
                       </div>
