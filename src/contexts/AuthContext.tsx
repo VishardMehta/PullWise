@@ -109,7 +109,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const { error } = await supabase
       .from('user_profiles')
-      .upsert(profileData, { onConflict: 'id' });
+      .upsert(profileData, { 
+        onConflict: 'github_id',
+        ignoreDuplicates: false 
+      });
 
     if (error) {
       console.error('Error syncing user profile:', error);
@@ -117,8 +120,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    navigate('/auth');
+    try {
+      // Sign out from Supabase (clears session)
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Clear any cached auth data
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.clear();
+      
+      // Reset state
+      setUser(null);
+      setSession(null);
+      
+      // Navigate to auth page
+      navigate('/auth');
+    } catch (error) {
+      console.error('Sign out error:', error);
+      // Still navigate even if error
+      navigate('/auth');
+    }
   };
 
   const value = {

@@ -13,13 +13,20 @@ const Auth = () => {
   const envConfigured = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 
   useEffect(() => {
+    // Only auto-redirect if we have a valid session
+    // Don't redirect if user just signed out (check if we're coming from sign out)
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      
+      // Only redirect if session exists and it's not stale
+      if (session && session.expires_at && session.expires_at * 1000 > Date.now()) {
         navigate("/profile");
       }
     };
-    checkUser();
+    
+    // Small delay to ensure sign-out has completed
+    const timer = setTimeout(checkUser, 100);
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   const handleGitHubLogin = async () => {
