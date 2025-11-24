@@ -283,6 +283,94 @@ export function PullRequestsView() {
     }
   };
 
+  const improvePRInSandbox = async (pr: PullRequest) => {
+    if (!analysisResult || !mlAnalysis) {
+      toast({
+        title: "Analysis Required",
+        description: "Please analyze the PR first before improving it in sandbox.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setImprovingInSandbox(true);
+
+    try {
+      const sessionRes = await supabase.auth.getSession();
+      const providerToken = sessionRes.data.session?.provider_token;
+
+      if (!providerToken) {
+        throw new Error('GitHub authentication required');
+      }
+
+      const urlParts = repoUrl.split('/');
+      const owner = urlParts[urlParts.length - 2];
+      const repo = urlParts[urlParts.length - 1];
+
+      // Get PR files with content
+      const filesResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/pulls/${pr.number}/files`,
+        {
+          headers: {
+            Authorization: `Bearer ${providerToken}`,
+            Accept: 'application/vnd.github+json',
+          },
+        }
+      );
+
+      const files = await filesResponse.json();
+      
+      // Fetch file contents
+      const filesWithContent = await Promise.all(
+        files.map(async (file: any) => {
+          const contentResponse = await fetch(file.contents_url, {
+            headers: {
+              Authorization: `Bearer ${providerToken}`,
+              Accept: 'application/vnd.github.raw',
+            },
+          });
+          const content = await contentResponse.text();
+          
+          return {
+            filename: file.filename,
+            patch: file.patch || '',
+            content,
+          };
+        })
+      );
+
+      // Get ML analysis score
+      const score = mlAnalysis?.score || 0;
+
+      // Improve in sandbox
+      const sandboxService = SandboxService.getInstance();
+      const improvement = await sandboxService.improvePRInSandbox(
+        pr.html_url,
+        pr.title,
+        score,
+        filesWithContent,
+        analysisResult.issues || []
+      );
+
+      toast({
+        title: "Sandbox Created!",
+        description: `Check your improved PR at ${improvement.improvedPR.repoUrl}`,
+      });
+
+      // Open the improved PR in a new tab
+      window.open(improvement.improvedPR.url, '_blank');
+
+    } catch (err) {
+      toast({
+        title: "Failed to Create Sandbox",
+        description: err instanceof Error ? err.message : 'An error occurred',
+        variant: "destructive",
+      });
+    } finally {
+      setImprovingInSandbox(false);
+    }
+  };
+
   const getStateIcon = (state: string) => {
     switch (state) {
       case 'open':
@@ -451,6 +539,29 @@ export function PullRequestsView() {
                       />
                     </div>
                   </div>
+
+                  {/* Improve in Sandbox button */}
+                  {analysisResult && mlAnalysis && !analysisLoading && (
+                    <div className="mt-6 flex justify-center">
+                      <Button
+                        onClick={() => improvePRInSandbox(pr)}
+                        disabled={improvingInSandbox}
+                        className="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30"
+                      >
+                        {improvingInSandbox ? (
+                          <>
+                            <Code className="mr-2 h-4 w-4 animate-spin" />
+                            Creating Improved Version...
+                          </>
+                        ) : (
+                          <>
+                            <TestTube className="mr-2 h-4 w-4" />
+                            Improve in Sandbox
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
