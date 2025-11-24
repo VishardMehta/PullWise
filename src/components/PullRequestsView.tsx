@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GitPullRequest, Link, MessageSquare, Clock, AlertCircle, CheckCircle2, XCircle, GitCommit, Code } from 'lucide-react';
@@ -272,38 +271,31 @@ export function PullRequestsView() {
   };
 
   return (
-    <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
-          <GitPullRequest className="h-5 w-5" />
-          Pull Requests
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-4 mb-6">
-          <Input
-            type="text"
-            placeholder="Enter repository URL (e.g., https://github.com/owner/repo)"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-white/40"
-          />
-          <Button
-            onClick={fetchPullRequests}
-            disabled={loading}
-            className="bg-primary hover:bg-primary/90"
-          >
-            {loading ? 'Loading...' : 'Fetch PRs'}
-          </Button>
+    <>
+      <div className="flex gap-4 mb-6">
+        <Input
+          type="text"
+          placeholder="Enter repository URL (e.g., https://github.com/owner/repo)"
+          value={repoUrl}
+          onChange={(e) => setRepoUrl(e.target.value)}
+          className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+        />
+        <Button
+          onClick={fetchPullRequests}
+          disabled={loading}
+          className="bg-primary hover:bg-primary/90"
+        >
+          {loading ? 'Loading...' : 'Fetch PRs'}
+        </Button>
+      </div>
+
+      {error && (
+        <div className="p-4 mb-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div className="p-4 mb-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-3">
+      <div className="space-y-3">
           {pullRequests.map((pr) => (
             <div
               key={pr.id}
@@ -409,26 +401,6 @@ export function PullRequestsView() {
             </div>
           ))}
         </div>
-
-        {/* Analysis Results */}
-        {selectedPR && (
-          <>
-            <Separator className="my-6 bg-white/10" />
-            <div className="grid grid-cols-2 gap-6">
-              <CodeAnalysisView
-                pullRequestId={selectedPR.id.toString()}
-                analysis={analysisResult}
-                loading={analysisLoading}
-              />
-              <MLAnalysisView
-                analysis={mlAnalysis}
-                loading={analysisLoading}
-                error={mlError}
-              />
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+    </>
   );
 }
