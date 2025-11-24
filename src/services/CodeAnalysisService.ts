@@ -326,7 +326,8 @@ export class CodeAnalysisService {
       const block = addedLines.slice(i, i + 5).map(l => l.content).join('\n');
       
       // Simple hashing for duplicate detection (browser-compatible)
-      const blockHash = btoa(block).slice(0, 20);
+      // Use encodeURIComponent to handle Unicode characters safely
+      const blockHash = btoa(unescape(encodeURIComponent(block))).slice(0, 20);
       
       if (codeBlocks.has(blockHash)) {
         const previousIndex = codeBlocks.get(blockHash)![0];
