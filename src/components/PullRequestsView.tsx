@@ -14,8 +14,12 @@ import { AnalysisHistoryService } from '@/services/AnalysisHistoryService';
 import { SandboxService } from '@/services/SandboxService';
 import { useToast } from '@/hooks/use-toast';
 import { ComparisonView } from '@/components/Sandbox/ComparisonView';
-import { SandboxService } from '@/services/SandboxService';
-import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface PullRequest {
   id: number;
@@ -394,18 +398,18 @@ export function PullRequestsView() {
   return (
     <>
       {/* Comparison View Modal */}
-      {showComparison && comparisonData && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
-          <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={showComparison} onOpenChange={setShowComparison}>
+        <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto bg-black/95 border-white/10 text-white">
+          {comparisonData && (
             <ComparisonView
               originalPR={comparisonData.originalPR}
               improvedPR={comparisonData.improvedPR}
               improvements={comparisonData.improvements}
               onClose={() => setShowComparison(false)}
             />
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="flex gap-4 mb-6">
         <Input
@@ -562,12 +566,12 @@ export function PullRequestsView() {
                   </div>
 
                   {/* Improve in Sandbox button */}
-                  {analysisResult && mlAnalysis && !analysisLoading && (
+                  {analysisResult && !analysisLoading && (
                     <div className="mt-6 flex justify-center">
                       <Button
                         onClick={() => improvePRInSandbox(pr)}
                         disabled={improvingInSandbox}
-                        className={mlAnalysis.score > 40 ? "bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30" : "bg-purple-500 hover:bg-purple-600 text-white"}
+                        className={analysisResult.issues.filter(i => i.severity === 'high').length > 0 ? "bg-purple-500 hover:bg-purple-600 text-white shadow-lg shadow-purple-500/50" : "bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30"}
                       >
                         {improvingInSandbox ? (
                           <>
