@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { PullRequestsView } from '@/components/PullRequestsView';
 import { TrendsView } from '@/components/Trends/TrendsView';
+import { SandboxView } from '@/components/Sandbox/SandboxView';
 import { DottedSurface } from '@/components/DottedSurface';
 import { DashboardHeader } from '@/components/DashboardHeader';
 import { Footer } from '@/components/Footer';
@@ -42,6 +43,7 @@ import {
   Users,
   UserPlus,
   HardDrive,
+  Flask,
 } from 'lucide-react';
 
 interface UserProfile {
@@ -443,6 +445,13 @@ const Dashboard = () => {
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Trends
               </TabsTrigger>
+              <TabsTrigger 
+                value="sandbox" 
+                className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-400 transition-colors"
+              >
+                <Flask className="h-4 w-4 mr-2" />
+                Sandbox
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="languages">
@@ -668,6 +677,10 @@ const Dashboard = () => {
 
             <TabsContent value="trends">
               <TrendsView />
+            </TabsContent>
+
+            <TabsContent value="sandbox">
+              <SandboxView />
             </TabsContent>
           </Tabs>
 
