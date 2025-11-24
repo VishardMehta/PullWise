@@ -13,6 +13,7 @@ import { MLAnalysisService } from '@/services/MLAnalysisService';
 import { AnalysisHistoryService } from '@/services/AnalysisHistoryService';
 import { SandboxService } from '@/services/SandboxService';
 import { useToast } from '@/hooks/use-toast';
+import { ComparisonView } from '@/components/Sandbox/ComparisonView';
 import { SandboxService } from '@/services/SandboxService';
 import { useToast } from '@/hooks/use-toast';
 
@@ -62,6 +63,8 @@ export function PullRequestsView() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [showDiff, setShowDiff] = useState(false);
   const [improvingInSandbox, setImprovingInSandbox] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
+  const [comparisonData, setComparisonData] = useState<any>(null);
 
   const fetchPullRequests = async () => {
     if (!repoUrl) {
@@ -357,6 +360,10 @@ export function PullRequestsView() {
         description: `Check your improved PR at ${improvement.improvedPR.repoUrl}`,
       });
 
+      // Show comparison view
+      setComparisonData(improvement);
+      setShowComparison(true);
+
       // Open the improved PR in a new tab
       window.open(improvement.improvedPR.url, '_blank');
 
@@ -386,6 +393,22 @@ export function PullRequestsView() {
 
   return (
     <>
+      {/* Comparison View Modal */}
+      {showComparison && comparisonData && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 overflow-y-auto">
+          <div className="min-h-screen px-4 py-8">
+            <div className="max-w-5xl mx-auto">
+              <ComparisonView
+                originalPR={comparisonData.originalPR}
+                improvedPR={comparisonData.improvedPR}
+                improvements={comparisonData.improvements}
+                onClose={() => setShowComparison(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex gap-4 mb-6">
         <Input
           type="text"
