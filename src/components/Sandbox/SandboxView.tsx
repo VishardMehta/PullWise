@@ -61,8 +61,10 @@ export function SandboxView() {
         description: 'Sandbox repository deleted successfully',
       });
 
-      await loadSandboxRepos();
+      // Remove from local state immediately
+      setSandboxRepos(prev => prev.filter(repo => repo.full_name !== repoFullName));
     } catch (error: any) {
+      console.error('Delete error:', error);
       toast({
         title: 'Deletion Failed',
         description: error.message || 'Failed to delete repository',
