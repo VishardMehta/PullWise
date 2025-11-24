@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowRight, 
   FileCode, 
@@ -30,8 +29,6 @@ interface ComparisonViewProps {
 }
 
 export function ComparisonView({ originalPR, improvedPR, improvements, onClose }: ComparisonViewProps) {
-  const [activeTab, setActiveTab] = useState('overview');
-
   // Parse improvements markdown to extract changes
   const parseImprovements = () => {
     const lines = improvements.split('\n');
@@ -143,162 +140,31 @@ export function ComparisonView({ originalPR, improvedPR, improvements, onClose }
         </CardContent>
       </Card>
 
-      {/* Tabs for different views */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-black/40 border border-white/10">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="changes">Changes Applied</TabsTrigger>
-          <TabsTrigger value="details">Improvement Details</TabsTrigger>
-        </TabsList>
+      {/* Improvement Details */}
+      <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
+        <CardHeader>
+          <CardTitle className="text-white">Improvement Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="prose prose-invert max-w-none">
+            <pre className="text-sm text-white/80 whitespace-pre-wrap bg-black/30 p-4 rounded-lg border border-white/10 max-h-96 overflow-y-auto">
+              {improvements || 'No detailed improvements available. The improved PR contains security fixes and best practices applied to your code.'}
+            </pre>
+          </div>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4 mt-4">
-          <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
-            <CardHeader>
-              <CardTitle className="text-white">What Was Fixed</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid gap-3">
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                  <CheckCircle2 className="h-5 w-5 text-green-400 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-white">Security Improvements</div>
-                    <div className="text-sm text-white/70">
-                      Fixed SQL injection vulnerabilities, added password hashing, implemented secure authentication
-                    </div>
-                  </div>
-                </div>
+          <Separator className="my-4 bg-white/10" />
 
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                  <CheckCircle2 className="h-5 w-5 text-blue-400 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-white">Input Validation</div>
-                    <div className="text-sm text-white/70">
-                      Added comprehensive input validation and sanitization to prevent injection attacks
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                  <CheckCircle2 className="h-5 w-5 text-purple-400 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-white">Error Handling</div>
-                    <div className="text-sm text-white/70">
-                      Implemented proper try-catch blocks and error logging for better reliability
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <CheckCircle2 className="h-5 w-5 text-yellow-400 mt-0.5" />
-                  <div>
-                    <div className="font-semibold text-white">Best Practices</div>
-                    <div className="text-sm text-white/70">
-                      Applied industry standard patterns and added helpful comments explaining security measures
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
-            <CardHeader>
-              <CardTitle className="text-white">How to Use This Improvement</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-white/70">
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                  1
-                </div>
-                <p>Click "View Improved PR" to see the full diff on GitHub</p>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                  2
-                </div>
-                <p>Review each change and understand why it improves security/quality</p>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                  3
-                </div>
-                <p>Apply similar patterns to your real PR</p>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-semibold">
-                  4
-                </div>
-                <p>Re-analyze your PR to see the score improvement</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Changes Applied Tab */}
-        <TabsContent value="changes" className="space-y-4 mt-4">
-          <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <FileCode className="h-5 w-5 text-purple-400" />
-                All Changes ({changes.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {changes.length > 0 ? (
-                  changes.map((change, index) => (
-                    <div
-                      key={index}
-                      className="p-3 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/30 transition-colors"
-                    >
-                      <div className="flex items-start gap-3">
-                        <CheckCircle2 className="h-4 w-4 text-green-400 mt-1" />
-                        <div className="flex-1">
-                          <div className="text-sm text-white font-medium">{change.description}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-white/60">
-                    <AlertCircle className="h-12 w-12 mx-auto mb-3 text-white/20" />
-                    <p>No specific changes detected. View the improved PR for details.</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Improvement Details Tab */}
-        <TabsContent value="details" className="space-y-4 mt-4">
-          <Card className="bg-black/20 border-white/10 backdrop-blur-2xl">
-            <CardHeader>
-              <CardTitle className="text-white">Full Improvement Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-invert max-w-none">
-                <pre className="text-sm text-white/80 whitespace-pre-wrap bg-black/30 p-4 rounded-lg border border-white/10">
-                  {improvements || 'No detailed improvements available. The improved PR contains security fixes and best practices applied to your code.'}
-                </pre>
-              </div>
-
-              <Separator className="my-4 bg-white/10" />
-
-              <div className="flex gap-2">
-                <Button
-                  className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30"
-                  onClick={() => window.open(improvedPR.repoUrl, '_blank')}
-                >
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  View Full Repository
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <div className="flex gap-2">
+            <Button
+              className="flex-1 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30"
+              onClick={() => window.open(improvedPR.repoUrl, '_blank')}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              View Full Repository
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -395,9 +395,9 @@ export function PullRequestsView() {
     <>
       {/* Comparison View Modal */}
       {showComparison && comparisonData && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center overflow-y-auto">
-          <div className="w-full max-w-5xl px-4 py-8 my-auto">
-            <div className="max-w-5xl mx-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 p-4 overflow-y-auto">
+          <div className="min-h-full flex items-center justify-center">
+            <div className="w-full max-w-5xl my-8">
               <ComparisonView
                 originalPR={comparisonData.originalPR}
                 improvedPR={comparisonData.improvedPR}
@@ -569,7 +569,7 @@ export function PullRequestsView() {
                       <Button
                         onClick={() => improvePRInSandbox(pr)}
                         disabled={improvingInSandbox}
-                        className="bg-purple-500 hover:bg-purple-600 text-white"
+                        className={mlAnalysis.score > 40 ? "bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30" : "bg-purple-500 hover:bg-purple-600 text-white"}
                       >
                         {improvingInSandbox ? (
                           <>
