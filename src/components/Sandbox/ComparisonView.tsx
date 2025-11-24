@@ -23,6 +23,7 @@ interface ComparisonViewProps {
   improvedPR: {
     url: string;
     repoUrl: string;
+    score: number;
   };
   improvements: string;
   onClose?: () => void;
@@ -56,7 +57,7 @@ export function ComparisonView({ originalPR, improvedPR, improvements, onClose }
   };
 
   const changes = parseImprovements();
-  const scoreImprovement = 85 - originalPR.score; // Estimated improvement
+  const scoreImprovement = improvedPR.score - originalPR.score;
 
   return (
     <div className="space-y-6">
@@ -109,9 +110,9 @@ export function ComparisonView({ originalPR, improvedPR, improvements, onClose }
             <div className="text-center">
               <div className="text-sm text-white/60 mb-2">Improved PR</div>
               <div className="relative">
-                <div className="text-5xl font-bold text-green-400">~85%</div>
+                <div className="text-5xl font-bold text-green-400">{improvedPR.score}%</div>
                 <Badge variant="outline" className="mt-2 border-green-500/30 text-green-400">
-                  Good Quality
+                  {improvedPR.score >= 80 ? 'Excellent' : improvedPR.score >= 60 ? 'Good Quality' : 'Improved'}
                 </Badge>
               </div>
             </div>

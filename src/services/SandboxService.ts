@@ -22,6 +22,7 @@ export interface PRImprovement {
   improvedPR: {
     url: string;
     repoUrl: string;
+    score: number;
   };
   improvements: string;
   sandboxRepo: SandboxRepo;
@@ -137,6 +138,16 @@ export class SandboxService {
       token
     );
     
+    // Calculate improved score based on issues fixed
+    // For each critical/high severity issue fixed, add points
+    const criticalIssues = issues.filter(i => i.severity === 'critical' || i.severity === 'high');
+    const issuesFixed = improvements.length;
+    
+    // Start with original score and add improvements
+    // Each fix adds roughly 10-15 points, capped at 95%
+    const scoreIncrease = Math.min(issuesFixed * 12, 95 - originalScore);
+    const improvedScore = Math.min(originalScore + scoreIncrease, 95);
+    
     return {
       originalPR: {
         url: prUrl,
@@ -146,6 +157,7 @@ export class SandboxService {
       improvedPR: {
         url: improvedPR.html_url,
         repoUrl: repo.html_url,
+        score: improvedScore,
       },
       improvements: improvements.join('\n\n'),
       sandboxRepo: {
