@@ -123,3 +123,81 @@ All colors MUST be HSL.
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* === Animations === */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); }
+}
+
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Staggered entrance animations */
+.animate-fade-in {
+  animation: fadeInUp 0.5s ease-out both;
+}
+.animate-fade-in-1 { animation: fadeInUp 0.5s ease-out 0.05s both; }
+.animate-fade-in-2 { animation: fadeInUp 0.5s ease-out 0.1s both; }
+.animate-fade-in-3 { animation: fadeInUp 0.5s ease-out 0.15s both; }
+.animate-fade-in-4 { animation: fadeInUp 0.5s ease-out 0.2s both; }
+.animate-fade-in-5 { animation: fadeInUp 0.5s ease-out 0.25s both; }
+.animate-fade-in-6 { animation: fadeInUp 0.5s ease-out 0.3s both; }
+
+/* Gradient border card utility */
+.card-gradient-border {
+  position: relative;
+  border-left: 3px solid;
+  transition: all 0.3s ease;
+}
+.card-gradient-border:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Active tab glow */
+.tab-glow {
+  position: relative;
+}
+.tab-glow::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #3b82f6);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.tab-glow[data-state="active"]::after {
+  opacity: 1;
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

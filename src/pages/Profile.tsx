@@ -15,7 +15,6 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import {
-  LogOut,
   MapPin,
   Building2,
   Link as LinkIcon,
@@ -26,6 +25,8 @@ import {
   FileText,
   Calendar,
   Loader2,
+  Github,
+  ExternalLink,
 } from 'lucide-react';
 
 interface UserProfile {
@@ -97,7 +98,6 @@ const Profile = () => {
           const text = await response.text();
           setUserReadme(text);
         } else {
-          // Try master branch if main doesn't exist
           const masterResponse = await fetch(
             `https://raw.githubusercontent.com/${profile.github_username}/${profile.github_username}/master/README.md`
           );
@@ -150,61 +150,93 @@ const Profile = () => {
     });
   };
 
+  const PROFILE_STATS = [
+    { label: 'Repositories', value: profile.public_repos, icon: GitFork, color: '#a78bfa', bg: 'rgba(139,92,246,0.12)' },
+    { label: 'Gists', value: profile.public_gists, icon: FileText, color: '#fbbf24', bg: 'rgba(251,191,36,0.12)' },
+    { label: 'Followers', value: profile.followers, icon: Users, color: '#f472b6', bg: 'rgba(244,114,182,0.12)' },
+    { label: 'Following', value: profile.following, icon: UserPlus, color: '#818cf8', bg: 'rgba(129,140,248,0.12)' },
+  ];
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       <DottedSurface />
 
       <div className="relative z-10">
-        <DashboardHeader 
-          profile={profile} 
-          currentPage="profile" 
+        <DashboardHeader
+          profile={profile}
+          currentPage="profile"
           onSignOut={signOut}
         />
 
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-1 bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardContent className="pt-6">
+            {/* Profile Sidebar */}
+            <Card className="lg:col-span-1 bg-white/[0.04] border-white/[0.08] backdrop-blur-sm rounded-2xl animate-fade-in-1">
+              <CardContent className="pt-8 pb-6">
                 <div className="flex flex-col items-center text-center">
-                  <Avatar className="h-32 w-32 mb-4">
-                    <AvatarImage src={profile.avatar_url} alt={profile.name} />
-                    <AvatarFallback className="text-2xl">
-                      {profile.name?.charAt(0) || profile.github_username?.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative mb-5">
+                    <Avatar className="h-28 w-28 ring-4 ring-white/10">
+                      <AvatarImage src={profile.avatar_url} alt={profile.name} />
+                      <AvatarFallback className="text-3xl bg-white/10 text-white">
+                        {profile.name?.charAt(0) || profile.github_username?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1 p-1.5 bg-green-500/20 rounded-full border-2 border-black">
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                    </div>
+                  </div>
 
-                  <h2 className="text-2xl font-bold text-white mb-1">
+                  <h2 className="text-2xl font-bold text-white mb-0.5">
                     {profile.name || profile.github_username}
                   </h2>
-                  <p className="text-white/60 mb-4">@{profile.github_username}</p>
+                  <p className="text-white/40 text-sm mb-4">@{profile.github_username}</p>
 
                   {profile.bio && (
-                    <p className="text-white/80 text-sm mb-4">{profile.bio}</p>
+                    <p className="text-white/60 text-sm mb-5 leading-relaxed max-w-[280px]">{profile.bio}</p>
                   )}
+
+                  {/* View on GitHub Button */}
+                  <a
+                    href={`https://github.com/${profile.github_username}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full mb-6"
+                  >
+                    <Button
+                      variant="outline"
+                      className="w-full h-10 border-white/10 text-white/70 hover:text-white hover:bg-white/[0.06] hover:border-white/20 rounded-xl transition-all"
+                    >
+                      <Github className="h-4 w-4 mr-2" />
+                      View on GitHub
+                      <ExternalLink className="h-3 w-3 ml-auto opacity-40" />
+                    </Button>
+                  </a>
+
+                  <Separator className="bg-white/[0.06] mb-5" />
 
                   <div className="w-full space-y-3 text-left">
                     {profile.company && (
-                      <div className="flex items-center gap-2 text-white/70">
-                        <Building2 className="h-4 w-4" />
-                        <span className="text-sm">{profile.company}</span>
+                      <div className="flex items-center gap-3 text-white/50 hover:text-white/70 transition-colors">
+                        <Building2 className="h-4 w-4 flex-shrink-0" />
+                        <span className="text-sm truncate">{profile.company}</span>
                       </div>
                     )}
 
                     {profile.location && (
-                      <div className="flex items-center gap-2 text-white/70">
-                        <MapPin className="h-4 w-4" />
-                        <span className="text-sm">{profile.location}</span>
+                      <div className="flex items-center gap-3 text-white/50 hover:text-white/70 transition-colors">
+                        <MapPin className="h-4 w-4 flex-shrink-0" />
+                        <span className="text-sm truncate">{profile.location}</span>
                       </div>
                     )}
 
                     {profile.blog && (
-                      <div className="flex items-center gap-2 text-white/70">
-                        <LinkIcon className="h-4 w-4" />
+                      <div className="flex items-center gap-3 text-white/50 hover:text-white/70 transition-colors">
+                        <LinkIcon className="h-4 w-4 flex-shrink-0" />
                         <a
                           href={profile.blog.startsWith('http') ? profile.blog : `https://${profile.blog}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm hover:text-white truncate"
+                          className="text-sm hover:text-blue-400 truncate transition-colors"
                         >
                           {profile.blog}
                         </a>
@@ -212,13 +244,13 @@ const Profile = () => {
                     )}
 
                     {profile.twitter_username && (
-                      <div className="flex items-center gap-2 text-white/70">
-                        <Twitter className="h-4 w-4" />
+                      <div className="flex items-center gap-3 text-white/50 hover:text-white/70 transition-colors">
+                        <Twitter className="h-4 w-4 flex-shrink-0" />
                         <a
                           href={`https://twitter.com/${profile.twitter_username}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm hover:text-white"
+                          className="text-sm hover:text-blue-400 transition-colors"
                         >
                           @{profile.twitter_username}
                         </a>
@@ -226,7 +258,7 @@ const Profile = () => {
                     )}
 
                     {profile.email && (
-                      <div className="flex items-center gap-2 text-white/70">
+                      <div className="flex items-center gap-3 text-white/50">
                         <span className="text-sm">{profile.email}</span>
                       </div>
                     )}
@@ -235,104 +267,84 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            <Card className="lg:col-span-2 bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white">GitHub Statistics</CardTitle>
+            {/* Stats & Info Panel */}
+            <Card className="lg:col-span-2 bg-white/[0.04] border-white/[0.08] backdrop-blur-sm rounded-2xl animate-fade-in-2">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white text-lg">GitHub Statistics</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <div className="h-12 w-12 rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-3">
-                      <GitFork className="h-6 w-6 text-purple-400" />
-                    </div>
-                    <p className="text-2xl font-bold text-white">{profile.public_repos}</p>
-                    <p className="text-sm text-white/60">Repositories</p>
-                  </div>
-
-                  <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <div className="h-12 w-12 rounded-lg bg-yellow-500/20 flex items-center justify-center mx-auto mb-3">
-                      <FileText className="h-6 w-6 text-yellow-400" />
-                    </div>
-                    <p className="text-2xl font-bold text-white">{profile.public_gists}</p>
-                    <p className="text-sm text-white/60">Gists</p>
-                  </div>
-
-                  <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <div className="h-12 w-12 rounded-lg bg-pink-500/20 flex items-center justify-center mx-auto mb-3">
-                      <Users className="h-6 w-6 text-pink-400" />
-                    </div>
-                    <p className="text-2xl font-bold text-white">{profile.public_repos}</p>
-                    <p className="text-sm text-white/60">Followers</p>
-                  </div>
-
-                  <div className="bg-white/5 rounded-lg p-4 text-center">
-                    <div className="h-12 w-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mx-auto mb-3">
-                      <UserPlus className="h-6 w-6 text-indigo-400" />
-                    </div>
-                    <p className="text-2xl font-bold text-white">{profile.following}</p>
-                    <p className="text-sm text-white/60">Following</p>
-                  </div>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  {PROFILE_STATS.map((stat, index) => {
+                    const Icon = stat.icon;
+                    return (
+                      <div
+                        key={index}
+                        className={`card-gradient-border bg-white/[0.03] rounded-xl p-4 text-center border border-white/[0.06] animate-fade-in-${index + 1}`}
+                        style={{ borderLeftColor: stat.color }}
+                      >
+                        <div
+                          className="h-11 w-11 rounded-xl flex items-center justify-center mx-auto mb-3"
+                          style={{ backgroundColor: stat.bg }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: stat.color }} />
+                        </div>
+                        <p className="text-2xl font-bold text-white tabular-nums">{stat.value}</p>
+                        <p className="text-xs text-white/40 mt-0.5">{stat.label}</p>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <Separator className="my-6 bg-white/10" />
+                <Separator className="my-6 bg-white/[0.06]" />
 
+                {/* Account Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Account Information</h3>
+                  <h3 className="text-base font-semibold text-white mb-4">Account Information</h3>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/70">GitHub ID:</span>
-                      <Badge variant="secondary" className="bg-white/10 text-white">
+                    <div className="flex justify-between items-center p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+                      <span className="text-white/50 text-sm">GitHub ID</span>
+                      <Badge variant="secondary" className="bg-white/[0.06] text-white/80 border-0 font-mono text-xs">
                         {profile.github_id}
                       </Badge>
                     </div>
 
-                    <div className="flex justify-between items-center">
-                      <span className="text-white/70">Account Created:</span>
-                      <span className="text-white flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
+                    <div className="flex justify-between items-center p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+                      <span className="text-white/50 text-sm">Account Created</span>
+                      <span className="text-white/80 text-sm flex items-center gap-2">
+                        <Calendar className="h-3.5 w-3.5 text-white/40" />
                         {formatDate(profile.github_created_at)}
                       </span>
                     </div>
 
                     {profile.github_updated_at && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-white/70">Last Updated:</span>
-                        <span className="text-white flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
+                      <div className="flex justify-between items-center p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+                        <span className="text-white/50 text-sm">Last Updated</span>
+                        <span className="text-white/80 text-sm flex items-center gap-2">
+                          <Calendar className="h-3.5 w-3.5 text-white/40" />
                           {formatDate(profile.github_updated_at)}
                         </span>
                       </div>
                     )}
                   </div>
                 </div>
-
-                {profile.raw_user_meta_data && (
-                  <>
-                    <Separator className="my-6 bg-white/10" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-white mb-4">
-                        Raw Profile Data
-                      </h3>
-                      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-5 border border-white/10">
-                        <pre className="text-xs text-white/80 font-mono leading-6">
-                          {JSON.stringify(profile.raw_user_meta_data, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  </>
-                )}
               </CardContent>
             </Card>
           </div>
 
-          {/* README Section - Full Width Below */}
+          {/* README Section */}
           {userReadme && (
-            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm max-w-5xl mx-auto">
-              <CardHeader>
-                <CardTitle className="text-white text-2xl">Profile README</CardTitle>
+            <Card className="mt-6 bg-white/[0.04] border-white/[0.08] backdrop-blur-sm max-w-5xl mx-auto rounded-2xl animate-fade-in">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-white text-lg flex items-center gap-3">
+                  <div className="p-2.5 bg-purple-500/15 rounded-xl">
+                    <FileText className="h-5 w-5 text-purple-400" />
+                  </div>
+                  Profile README
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-black/30 rounded-lg p-6">
+                <div className="bg-black/30 rounded-xl p-6 border border-white/[0.04]">
                   <div className="prose prose-invert max-w-none">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
@@ -386,20 +398,25 @@ const Profile = () => {
           )}
 
           {!userReadme && !readmeLoading && (
-            <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm max-w-5xl mx-auto">
-              <CardHeader>
-                <CardTitle className="text-white text-2xl">Profile README</CardTitle>
+            <Card className="mt-6 bg-white/[0.04] border-white/[0.08] backdrop-blur-sm max-w-5xl mx-auto rounded-2xl animate-fade-in">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-white text-lg flex items-center gap-3">
+                  <div className="p-2.5 bg-purple-500/15 rounded-xl">
+                    <FileText className="h-5 w-5 text-purple-400" />
+                  </div>
+                  Profile README
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-white/60 text-sm">
-                  No README found. Create a repository named <Badge className="bg-white/20 text-white">{profile.github_username}</Badge> with a README.md file to display your profile here.
+                <p className="text-white/40 text-sm">
+                  No README found. Create a repository named <Badge className="bg-white/10 text-white/70 border-0">{profile.github_username}</Badge> with a README.md file to display your profile here.
                 </p>
               </CardContent>
             </Card>
           )}
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
