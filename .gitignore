@@ -1,2 +1,25 @@
+# Dependencies
 node_modules/
+backend/node_modules/
+
+# Environment variables
 .env
+backend/.env
+
+# Build output
+dist/
+
+# Logs
+*.log
+vite.log
+
+# Lockfiles (using npm, not bun)
+bun.lockb
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
