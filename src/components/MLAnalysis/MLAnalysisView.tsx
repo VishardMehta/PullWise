@@ -60,7 +60,7 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
         <h3 className="text-lg font-semibold text-white">AI Code Review</h3>
         {analysis.classification && (
           <Badge className="ml-auto text-xs bg-purple-500/20 text-purple-300 border-purple-500/30">
-            {analysis.classification.label} 
+            {analysis.classification.label}
             {analysis.classification.confidence && ` (${Math.round(analysis.classification.confidence * 100)}%)`}
           </Badge>
         )}
@@ -69,19 +69,25 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
       {/* Summary Section */}
       <div className="p-4 bg-white/5 rounded-lg border border-white/10">
         <h4 className="text-sm font-medium text-white/80 mb-2">Summary</h4>
-        <p className="text-white/60 leading-relaxed">{analysis.summary || 'Analysis in progress...'}</p>
+        <p className="text-white/60 leading-relaxed text-sm">
+          {typeof analysis.summary === 'string'
+            ? analysis.summary
+            : (analysis.summary && typeof analysis.summary === 'object'
+              ? JSON.stringify(analysis.summary)
+              : 'Analysis in progress...')}
+        </p>
       </div>
 
       {/* Score Cards - Enhanced */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {/* Impact Score */}
-        <div className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
-          <div className="flex items-center justify-between mb-2">
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-yellow-400" />
               <h4 className="text-sm font-medium text-white/80">Impact</h4>
             </div>
-            <span className="text-xs font-bold text-white">
+            <span className="text-sm font-bold text-white">
               {analysis.impact?.score ?? 0}/100
             </span>
           </div>
@@ -89,19 +95,19 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
             value={analysis.impact?.score ?? 0}
             className="h-2"
           />
-          <p className="text-xs text-white/50 mt-2">
-            {analysis.impact?.reason?.split('.')[0]}
+          <p className="text-xs text-white/40 mt-2 line-clamp-2">
+            {typeof analysis.impact?.reason === 'string' ? analysis.impact.reason.split('.')[0] : 'No impact assessment available'}
           </p>
         </div>
 
         {/* Code Quality */}
-        <div className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
-          <div className="flex items-center justify-between mb-2">
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-400" />
               <h4 className="text-sm font-medium text-white/80">Quality</h4>
             </div>
-            <span className="text-xs font-bold text-white">
+            <span className="text-sm font-bold text-white">
               {analysis.codeQuality?.score ?? 0}/100
             </span>
           </div>
@@ -109,31 +115,30 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
             value={analysis.codeQuality?.score ?? 0}
             className="h-2"
           />
-          <p className="text-xs text-white/50 mt-2">
-            {analysis.codeQuality?.feedback?.[0] || 'Code quality analysis'}
+          <p className="text-xs text-white/40 mt-2 line-clamp-2">
+            {(typeof analysis.codeQuality?.feedback?.[0] === 'string' ? analysis.codeQuality.feedback[0] : null) || 'Code quality analysis'}
           </p>
         </div>
 
         {/* Risk Level */}
-        <div className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
-          <div className="flex items-center justify-between mb-2">
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Shield className="h-4 w-4 text-red-400" />
               <h4 className="text-sm font-medium text-white/80">Risk Level</h4>
             </div>
             {analysis.risks && analysis.risks.length > 0 && (
-              <Badge className={`text-xs ${
-                analysis.risks.some(r => r.level === 'high') ? 'bg-red-500/20 text-red-300' :
-                analysis.risks.some(r => r.level === 'medium') ? 'bg-yellow-500/20 text-yellow-300' :
-                'bg-green-500/20 text-green-300'
-              }`}>
+              <Badge className={`text-xs ${analysis.risks.some(r => r.level === 'high') ? 'bg-red-500/20 text-red-300' :
+                  analysis.risks.some(r => r.level === 'medium') ? 'bg-yellow-500/20 text-yellow-300' :
+                    'bg-green-500/20 text-green-300'
+                }`}>
                 {analysis.risks.some(r => r.level === 'high') ? 'High' :
-                 analysis.risks.some(r => r.level === 'medium') ? 'Medium' :
-                 'Low'}
+                  analysis.risks.some(r => r.level === 'medium') ? 'Medium' :
+                    'Low'}
               </Badge>
             )}
           </div>
-          <div className="text-sm text-white/60">
+          <div className="text-sm text-white/50">
             {analysis.risks?.length || 0} potential issue{(analysis.risks?.length || 0) !== 1 ? 's' : ''}
           </div>
         </div>
@@ -155,11 +160,10 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
                   <span className="text-sm font-medium text-white">
                     {risk.description}
                   </span>
-                  <Badge className={`text-xs ${
-                    risk.level === 'high' ? 'bg-red-500/20 text-red-300' :
-                    risk.level === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
-                    'bg-blue-500/20 text-blue-300'
-                  }`}>
+                  <Badge className={`text-xs ${risk.level === 'high' ? 'bg-red-500/20 text-red-300' :
+                      risk.level === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
+                        'bg-blue-500/20 text-blue-300'
+                    }`}>
                     {risk.level}
                   </Badge>
                 </div>
@@ -212,7 +216,7 @@ export function MLAnalysisView({ analysis, loading, error }: MLAnalysisViewProps
           )}
         </div>
       )}
-      
+
       {/* Explanation section with failing code, root cause, minimal patch */}
       {analysis.explanation && (
         <div className="p-4 bg-black/20 rounded-lg border border-white/10">

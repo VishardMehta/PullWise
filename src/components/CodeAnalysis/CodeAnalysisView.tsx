@@ -59,7 +59,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
     if (message?.includes('duplication') || message?.includes('Duplicate')) {
       return <Copy className="h-4 w-4 text-blue-500" />;
     }
-    
+
     switch (type) {
       case 'error':
         return <AlertCircle className="h-4 w-4 text-red-500" />;
@@ -110,7 +110,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
 
   return (
     <Card className="bg-black/80 border-white/10 backdrop-blur-md">
-        <CardHeader>
+      <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Code className="h-5 w-5" />
           {title}
@@ -118,7 +118,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
       </CardHeader>
       <CardContent>
         {/* Metrics Overview - Enhanced */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Complexity Score */}
           <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-2 mb-2">
@@ -132,7 +132,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
               {analysis.metrics.complexity > 15 ? '⚠️ Critical' : analysis.metrics.complexity > 7 ? '⚠️ High' : '✅ Good'}
             </div>
           </div>
-          
+
           {/* Coverage */}
           <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-2 mb-2">
@@ -144,7 +144,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
             </div>
             <div className="text-xs text-white/40 mt-1">Test coverage</div>
           </div>
-          
+
           {/* Duplications */}
           <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-2 mb-2">
@@ -156,7 +156,7 @@ export function CodeAnalysisView({ pullRequestId, analysis, loading = false, tit
             </div>
             <div className="text-xs text-white/40 mt-1">Code copy-paste</div>
           </div>
-          
+
           {/* Total Issues */}
           <div className="bg-white/5 rounded-lg p-4 min-w-0 hover:bg-white/10 transition-colors">
             <div className="flex items-center gap-2 mb-2">
